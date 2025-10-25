@@ -12,7 +12,8 @@ class Views:
     def LoginView(self):
         field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON)
         field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
-        def click_logar(e):
+        
+        def click_logar(e):#Validar Login
             Login(self.page, field_Usuario, field_Senha)
             self.page.update()
         
@@ -27,7 +28,6 @@ class Views:
                                     field_Usuario,
                                     field_Senha,
                                     ft.Container(
-                                        #content = ft.FilledButton(text=">", expand=True, on_click=lambda _:page.go("/home")), #Vai pra pag inicial
                                         content = ft.FilledButton(text=">", expand=True, on_click=click_logar), #Apenas Referênciar a função
                                         alignment=ft.alignment.center_right,
                                         width=300

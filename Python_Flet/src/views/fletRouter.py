@@ -1,14 +1,15 @@
 import flet as ft
 from flet import RouteChangeEvent, View, ViewPopEvent
 
-#Importando as View
+#Importando as Views(Páginas)
 from .Views import Views
 
+#Gerenciar e realizar Routing dos Endereços(Routes)
 class Router:
 
     def __init__(self, page: ft.Page):
         self.page = page
-        self.pgs = Views(self.page)
+        self.pgs = Views(self.page) #Views(Pags) como objs
 
     def route_change(self):
         self.page.views.clear()
@@ -19,6 +20,6 @@ class Router:
             "/home": self.pgs.HomeView(),
         }
 
-        #Puxar do dicionário o Route da pagina indicada
+        #Puxar do dicionário a pagina atrelada ao Route indicado e coloca-la nas views
         self.page.views.append(self.routes.get(self.page.route))
         self.page.update()

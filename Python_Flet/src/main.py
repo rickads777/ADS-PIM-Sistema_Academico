@@ -24,8 +24,8 @@ def main(page: ft.Page):
         page.go(topView.route) #Pega a rota da anterior e vai
         
     
-    #adcionar elementos na página
-    page.on_route_change = route_change
+    #adcionar página no app
+    page.on_route_change = route_change #definir comportamente quando route for mudado
     page.on_view_pop = view_pop
     page.go(page.route)
     

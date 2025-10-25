@@ -1,0 +1,1 @@
+#Precisa disso pro python entender que tem pacotes e assim puxar classes de outros arquivos
