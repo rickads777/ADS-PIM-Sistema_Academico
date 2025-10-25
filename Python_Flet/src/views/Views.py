@@ -1,39 +1,29 @@
 import flet as ft
-from flet import RouteChangeEvent, View, ViewPopEvent
-from funcoes import Login
+from .funcoes import Login
 
-nomeApp = "EducaZone"
-        
-def main(page: ft.Page):
-    page.title = nomeApp
-    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.padding = 80
-  
-    field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON)
-    field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
-    #Capturar altura e largura do app
-    WIDTH: int = page.width
-    HEIGHT: int = page.height
 
-    #Teste Login
-    def click_logar(e):
-        Login(page, field_Usuario, field_Senha)
-        page.update()
+#Todas as Páginas
+
+class Views:
+    def __init__(self, page: ft.Page):
+        self.page = page
     
-    #Controlar Navegação
-    def route_change(e: RouteChangeEvent) -> None:
-        page.views.clear()
+    #Página de Login
+    def LoginView(self):
+        field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON)
+        field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
+        def click_logar(e):
+            Login(self.page, field_Usuario, field_Senha)
+            self.page.update()
         
-        #Login View
-        page.views.append(
-            View(
+        content = ft.View(
                 route="/",
                 controls=[
                     ft.Row(#"Container" dos elementos
                         [
                             ft.Column(#Coluna, 1 em cima do outro
                                 [
-                                    ft.Text(value=f"Boas Vindas ao {nomeApp}!\nSua classe digital", size=25),
+                                    ft.Text(value=f"Boas Vindas ao EducaZone!\nSua classe digital", size=25),
                                     field_Usuario,
                                     field_Senha,
                                     ft.Container(
@@ -63,32 +53,16 @@ def main(page: ft.Page):
                 ],
                 horizontal_alignment= ft.CrossAxisAlignment.CENTER,
                 vertical_alignment=ft.MainAxisAlignment.CENTER,
-            )    
-        )
-        
-        #Home View
-        if page.route =="/home":
-            page.views.append(
-                View(
-                    route="/home",
+            )
+        return content    
+    #Página Home (Testes)
+    def HomeView(self):
+        content = ft.View(
+            route="/home",
                     controls=[
-                        ft.ElevatedButton("Voltar", on_click=lambda _:page.go("/"))
+                        ft.ElevatedButton("Voltar", on_click=lambda _:self.page.go("/"))
                     ],
                     horizontal_alignment= ft.CrossAxisAlignment.CENTER,
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
-                    
-                )
-            )
-        page.update()
-    
-    def view_pop(e: ViewPopEvent): #Voltar a página
-        page.views.pop() #Remove pag atual
-        topView: View = page.views[-1] 
-        page.go(topView.route) #Pega a rota da anterior e vai
-    #adcionar elementos na página
-
-    page.on_route_change = route_change
-    page.on_view_pop = view_pop
-    page.go(page.route)
-    
-ft.app(target=main)
+        )
+        return content                   
