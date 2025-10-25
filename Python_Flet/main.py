@@ -1,5 +1,6 @@
 import flet as ft
 from flet import RouteChangeEvent, View, ViewPopEvent
+from funcoes import Login
 
 nomeApp = "EducaZone"
         
@@ -12,7 +13,12 @@ def main(page: ft.Page):
     field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
     #Capturar altura e largura do app
     WIDTH: int = page.width
-    HEIGHT: int = page.height  
+    HEIGHT: int = page.height
+
+    #Teste Login
+    def click_logar(e):
+        Login(page, field_Usuario, field_Senha)
+        page.update()
     
     #Controlar Navegação
     def route_change(e: RouteChangeEvent) -> None:
@@ -30,10 +36,11 @@ def main(page: ft.Page):
                                     ft.Text(value=f"Boas Vindas ao {nomeApp}!\nSua classe digital", size=25),
                                     field_Usuario,
                                     field_Senha,
-                                    ft.Row(
-                                        [
-                                            ft.FilledButton(text=">", expand=True, on_click=lambda _:page.go("/home")), #Vai pra pag inicial
-                                        ], 
+                                    ft.Container(
+                                        #content = ft.FilledButton(text=">", expand=True, on_click=lambda _:page.go("/home")), #Vai pra pag inicial
+                                        content = ft.FilledButton(text=">", expand=True, on_click=click_logar), #Apenas Referênciar a função
+                                        alignment=ft.alignment.center_right,
+                                        width=300
                                     )
                                 ],
                                 spacing=25,
