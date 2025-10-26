@@ -10,13 +10,22 @@ class Views:
     
     #Página de Login
     def LoginView(self):
-        field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON)
+        field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON, autofocus=True)
         field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
         
-        def click_logar(e):#Validar Login
+        #Validar Login
+        def click_logar(e):
             Login(self.page, field_Usuario, field_Senha)
             self.page.update()
         
+        #Quando pressionar um botão
+        def keyboard_press(e: ft.KeyboardEvent):
+            if e.key == "Enter": #No enter Loga
+                Login(self.page, field_Usuario, field_Senha)
+                self.page.update()
+
+        self.page.on_keyboard_event = keyboard_press
+
         content = ft.View(
                 route="/",
                 controls=[
