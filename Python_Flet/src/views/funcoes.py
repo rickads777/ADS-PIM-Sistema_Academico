@@ -7,6 +7,5 @@ def Login( page: ft.Page, nome: ft.TextField, senha : ft.TextField):
     elif senha.value != "admin":
         senha.error_text = "Senha Incorreta"
     else:
-        page.go("/home")
-        return "admin"
+        page.go("/admin/home")
     page.update

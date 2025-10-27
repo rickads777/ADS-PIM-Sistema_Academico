@@ -10,6 +10,7 @@ class Router:
     def __init__(self, page: ft.Page):
         self.page = page
         self.pgs = Views(self.page) #Views(Pags) como objs
+        self.adm_pgs = views_Adm(self.page)
 
     def route_change(self):
         self.page.views.clear()
@@ -18,6 +19,7 @@ class Router:
         self.routes = { 
             "/": self.pgs.LoginView(),
             "/home": self.pgs.HomeView(),
+            "/admin/home": self.adm_pgs.HomeView(),
         }
 
         #Puxar do dicionário a pagina atrelada ao Route indicado e coloca-la nas views

@@ -4,25 +4,28 @@ from .Sidebar import *
 
 
 
-
 #Todas as Páginas
 #Ver se essas são padrões e criar classes filhas que herdam isso e adicionam o específico
 #Views_prof, views_aluno etc
 
 class Views:
+    
     def __init__(self, page: ft.Page):
         self.page = page
+        self.content: ft.View #Páginas retornadas
+        self.body: ft.Row #Corpo das views
     
     #Página de Login
     def LoginView(self):
 
-        #campos
+        #campos e variáveis
         field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON, autofocus=True)
         field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
+
         
         #Validar Login
         def click_logar(e):
-            tipoUsuario = Login(self.page, field_Usuario, field_Senha)
+            Login(self.page, field_Usuario, field_Senha)
             self.page.update()
         
         #Quando pressionar um botão
@@ -33,7 +36,7 @@ class Views:
 
         self.page.on_keyboard_event = keyboard_press
 
-        content = ft.View(
+        self.content = ft.View(
                 route="/",
                 controls=[
                     ft.Row(#"Container" dos elementos
@@ -70,15 +73,39 @@ class Views:
                 horizontal_alignment= ft.CrossAxisAlignment.CENTER,
                 vertical_alignment=ft.MainAxisAlignment.CENTER,
             )
-        return content    
+        return self.content    
+    
     #Página Home (Testes)
     def HomeView(self):
-        content = ft.View(
-            route="/home",
+        self.body = ft.Row(
+            [
+                ft.ElevatedButton("Voltar", on_click=lambda _:self.page.go("/"))
+            ], expand=True
+        )
+        self.content = ft.View(
+            #route="/home", Inserir separada nas filhas
                     controls=[
-                        ft.ElevatedButton("Voltar", on_click=lambda _:self.page.go("/"))
+                        self.body
                     ],
                     horizontal_alignment= ft.CrossAxisAlignment.CENTER,
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
+                    
         )
-        return content                   
+        return self.content                   
+    
+
+class views_Adm(Views):
+
+    def __init__(self, page):
+        super().__init__(page)
+        self.sideAdm = sidebarAdmin(self.page).rtnSide() #Recebe o navRail de Adm
+
+    def HomeView(self):
+        super().HomeView()
+        #Adiciona as partes únicas
+        self.body.controls.insert(0,self.sideAdm)
+        self.body.controls.append(ft.Text(value="Página de admin"))
+        self.content.route = "/admin/home"
+        return self.content
+
+ 
