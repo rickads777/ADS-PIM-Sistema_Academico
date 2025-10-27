@@ -1,19 +1,22 @@
 import flet as ft
 from flet import *
+from .customControls import sideDestination
 
 #Sidebar é uma navrail no flet
 class Sidebar(): 
     def __init__(self, page: ft.Page):
         
         #Setando destinations padrões que terão o label definido nas subclasses
-        self.nrdHome = ft.NavigationRailDestination( 
-            icon = Icons.HOME, 
-            label_content=ft.Text("Início"),
+        self.nrdHome = sideDestination( 
+            Icons.HOME,
+            "" ,
+            "Início"
         )
 
-        self.nrdConfigs = ft.NavigationRailDestination(
-            icon = Icons.SETTINGS,
-            label_content=ft.Text("Configurações")
+        self.nrdConfigs = sideDestination(
+            Icons.SETTINGS,
+            "",
+            "Configurações"
         )
 
 
@@ -26,7 +29,7 @@ class Sidebar():
             destinations=[ 
                 self.nrdHome,
             ],
-            bgcolor="blue"
+            bgcolor="blue",
         )
         
     def rtnSide(self):
@@ -60,21 +63,21 @@ class sidebarAdmin(Sidebar):
     def __init__(self, page):
         super().__init__(page)
         destinations = [
-            ft.NavigationRailDestination(
-                icon=Icons.ASSIGNMENT_IND,
-                label="/admin/cadastro",
-                label_content=ft.Text("Cadastro")
+            sideDestination(
+                Icons.ASSIGNMENT_IND,
+                "/admin/cadastro",
+                "Cadastro"),
+            sideDestination(
+                Icons.SCHOOL,
+                "/admin/professores",
+                "Professores"
             ),
-            ft.NavigationRailDestination(
-                icon=Icons.SCHOOL,
-                label="/admin/professores",
-                label_content=ft.Text("Professores")
+            sideDestination(
+                Icons.GROUPS,
+                "admin/alunos",
+                "Alunos"
             ),
-            ft.NavigationRailDestination(
-                icon=Icons.GROUPS,
-                label="/admin/alunos",
-                label_content=ft.Text("Alunos")
-            ),
+
             self.nrdConfigs
         ]
         for testes in  destinations: #adicionar destinos no rail
