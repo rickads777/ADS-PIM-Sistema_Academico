@@ -2,8 +2,6 @@ import flet as ft
 from .funcoes import Login
 from .Sidebar import *
 
-
-
 #Todas as Páginas
 #Ver se essas são padrões e criar classes filhas que herdam isso e adicionam o específico
 #Views_prof, views_aluno etc
@@ -14,6 +12,9 @@ class Views:
         self.page = page
         self.content: ft.View #Páginas retornadas
         self.body: ft.Row #Corpo das views
+
+        #Rows estruturais para Home
+        
     
     #Página de Login
     def LoginView(self):
@@ -79,7 +80,7 @@ class Views:
     def HomeView(self):
         self.body = ft.Row(
             [
-                ft.ElevatedButton("Voltar", on_click=lambda _:self.page.go("/"))
+                ft.ElevatedButton("Voltar", on_click=lambda _:self.page.go("/"), )
             ], expand=True
         )
         self.content = ft.View(

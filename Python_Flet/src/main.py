@@ -7,7 +7,7 @@ nomeApp = "EducaZone"
 def main(page: ft.Page):
     page.title = nomeApp
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.padding = 80
+    page.padding = 0
     router = Router(page)
 
     #Capturar altura e largura do app
@@ -22,9 +22,8 @@ def main(page: ft.Page):
         page.views.pop() #Remove pag atual
         topView: View = page.views[-1] 
         page.go(topView.route) #Pega a rota da anterior e vai
-        
     
-    #adcionar página no app
+    #adicionar página no app
     page.on_route_change = route_change #definir comportamente quando route for mudado
     page.on_view_pop = view_pop
     page.go(page.route)
