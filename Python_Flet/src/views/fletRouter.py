@@ -2,7 +2,7 @@ import flet as ft
 from flet import RouteChangeEvent, View, ViewPopEvent
 
 #Importando as Views(Páginas)
-from .Views import Views
+from .Views import *
 
 #Gerenciar e realizar Routing dos Endereços(Routes)
 class Router:

@@ -1,8 +1,13 @@
 import flet as ft
 from .funcoes import Login
+from .Sidebar import *
+
+
 
 
 #Todas as Páginas
+#Ver se essas são padrões e criar classes filhas que herdam isso e adicionam o específico
+#Views_prof, views_aluno etc
 
 class Views:
     def __init__(self, page: ft.Page):
@@ -10,12 +15,14 @@ class Views:
     
     #Página de Login
     def LoginView(self):
+
+        #campos
         field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON, autofocus=True)
         field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
         
         #Validar Login
         def click_logar(e):
-            Login(self.page, field_Usuario, field_Senha)
+            tipoUsuario = Login(self.page, field_Usuario, field_Senha)
             self.page.update()
         
         #Quando pressionar um botão
