@@ -1,10 +1,11 @@
 import flet as ft
-from .funcoes import Login
+from .funcoes import *
 from .Sidebar import *
 from .customControls import *
 #Todas as Páginas
 #Ver se essas são padrões e criar classes filhas que herdam isso e adicionam o específico
 #Views_prof, views_aluno etc
+
 
 class Views:
     
@@ -12,10 +13,26 @@ class Views:
         self.page = page
         self.content: ft.View #Páginas retornadas
         self.body: ft.Row #Corpo das views
+        self.sidebar: ft.NavigationRail #Sidebar que será retornada
+        
+        #botão de colapsar a sidebar 
+        def toggle_sidebar(e): #função pro click
+            self.toggle_nav_rail_button.selected = not self.toggle_nav_rail_button.selected
+            controle_Sidebar(self.page, self.sidebar)
 
-        #Rows estruturais para Home
+        self.toggle_nav_rail_button = ft.IconButton(
+            icon=ft.Icons.ARROW_CIRCLE_LEFT,
+            icon_color=ft.Colors.BLUE_GREY_400,
+            selected=False,
+            selected_icon=ft.Icons.ARROW_CIRCLE_RIGHT,
+            on_click=toggle_sidebar
+        )
 
-    
+    #funcoes para os btns
+
+
+    #Páginas(Views)
+
     #Página de Login
     def LoginView(self):
 
@@ -99,18 +116,29 @@ class views_Adm(Views):
 
     def __init__(self, page):
         super().__init__(page)
-        self.sideAdm = sidebarAdmin(self.page).rtnSide() #Recebe o navRail de Adm
+        self.sidebar = sidebarAdmin(self.page).rtnSide() #Recebe o navRail de Adm
+        
+
 
     def HomeView(self):
         super().HomeView()
 
-        #Define o copor da página
+
+        #Define o corpo da página
         self.body = ft.Row(
             [
-                self.sideAdm,
-                #topo (btn retornar)
+                self.sidebar, 
                 ft.Column(
                     [
+                        self.toggle_nav_rail_button
+                    ], alignment=ft.MainAxisAlignment.START
+                ),
+
+                ft.Column(width=30), #Margem entre navrail e coluna
+
+                ft.Column(
+                    [
+                        #topo (btn retornar)
                         ft.Row(
                             [
                                 ft.ElevatedButton(
@@ -123,6 +151,7 @@ class views_Adm(Views):
                             alignment=ft.MainAxisAlignment.END,
                             
                         ),
+                        
                         #Meio para os cards  
                         ft.Row(
                             [

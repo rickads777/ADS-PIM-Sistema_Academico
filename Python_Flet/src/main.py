@@ -18,7 +18,7 @@ def main(page: ft.Page):
     def route_change(e: RouteChangeEvent):
         router.route_change()
     
-    def view_pop(e: ViewPopEvent): #Voltar a página
+    def view_pop(e: ViewPopEvent): #Voltar a páginas
         page.views.pop() #Remove pag atual
         topView: View = page.views[-1] 
         page.go(topView.route) #Pega a rota da anterior e vai
