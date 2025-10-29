@@ -32,22 +32,14 @@ class Sidebar():
             destinations=[ 
                 self.nrdHome,
             ],
-            bgcolor="blue"
-        )
-
-        content = ft.Column(
-            [
-                
-            ],
+            bgcolor="blue",
+            selected_index=0 #Testar se vai dar problema isso quando fizer as trocas, acho que não pq teoricamente ela só é construída quando entra pela primeira vez
         )
         
-        #Coluna que habita a sidebar(Feito pra ter o botão )
-        def clickSide_Control(e): #Função pro click
-            controle_Sidebar(self.page, self.rail)
+
 
         
     def rtnSide(self):
-        
         return self.rail #Retorna a NavRail
     
     
@@ -57,22 +49,73 @@ class Sidebar():
 class sidebarProf(Sidebar): 
     def __init__(self, page):
         super().__init__(page)
-        self.rail.destinations.append(NavigationRailDestination(),) #Adicionando os destinhos específicos para professor
-    
+        destinations = [
+            sideDestination(
+                Icons.MENU_BOOK,
+                "/aluno/biblioteca",
+                "Biblioteca",
+            ),
+            
+            sideDestination(
+                Icons.MONITOR,
+                "/aluno/aulas",
+                "Aulas",
+
+            ),
+            sideDestination(
+                Icons.INSERT_CHART,
+                "/aluno/notas",
+                "Notas",
+
+            ),
+            sideDestination(
+                Icons.LIBRARY_BOOKS,
+                "/aluno/atividades",
+                "Atividades",
+
+            ),
+            self.nrdConfigs
+        ]
+        for destino in destinations:
+            self.rail.destinations.append(destino)
+        
     def rtnSide(self):
         return super().rtnSide()
 
 class sidebarAluno(Sidebar):
     def __init__(self, page):
         super().__init__(page)
-        self.rail.destinations.append(
-            ft.NavigationRailDestination(
-                icon=Icons.MENU_BOOK,
-                label_content="Biblioteca",
-                label="/aluno/biblioteca",
-            )
-        )
 
+        destinations = [
+            sideDestination(
+                Icons.MENU_BOOK,
+                "/aluno/biblioteca",
+                "Biblioteca",
+            ),
+            
+            sideDestination(
+                Icons.MONITOR,
+                "/aluno/aulas",
+                "Aulas",
+
+            ),
+            sideDestination(
+                Icons.INSERT_CHART,
+                "/aluno/notas",
+                "Notas",
+
+            ),
+            sideDestination(
+                Icons.LIBRARY_BOOKS,
+                "/aluno/atividades",
+                "Atividades",
+
+            ),
+            self.nrdConfigs
+        ]
+        for destino in destinations:
+            self.rail.destinations.append(destino)
+            
     def rtnSide(self):
         return super().rtnSide()
     

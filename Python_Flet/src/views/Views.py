@@ -123,7 +123,6 @@ class views_Adm(Views):
     def HomeView(self):
         super().HomeView()
 
-
         #Define o corpo da página
         self.body = ft.Row(
             [
@@ -131,7 +130,8 @@ class views_Adm(Views):
                 ft.Column(
                     [
                         self.toggle_nav_rail_button
-                    ], alignment=ft.MainAxisAlignment.START
+                    ], 
+                    alignment=ft.MainAxisAlignment.START
                 ),
 
                 ft.Column(width=30), #Margem entre navrail e coluna
@@ -172,9 +172,68 @@ class views_Adm(Views):
 
         )
 
-        #self.body.controls.append(ft.Text(value="Página de admin"))
         self.content.route = "/admin/home"
         self.content.controls.append(self.body) #add corpo a view
         return self.content
+    
+class views_aluno(Views):
+    def __init__(self, page):
+        super().__init__(page)
+        self.sidebar = sidebarAluno(self.page).rtnSide() #Recebe o navRail de Adm
 
- 
+    def HomeView(self):
+        super().HomeView()
+        
+        #Define o corpo da página
+        self.body = ft.Row(
+            [
+                self.sidebar, 
+                ft.Column(
+                    [
+                        self.toggle_nav_rail_button
+                    ], 
+                    alignment=ft.MainAxisAlignment.START
+                ),
+
+                ft.Column(width=30), #Margem entre navrail e coluna
+
+                ft.Column(
+                    [
+                        #topo (btn retornar)
+                        ft.Row(
+                            [
+                                ft.ElevatedButton(
+                                    text="<<",
+                                    on_click=lambda _:self.page.go("/"), #Precisa chamar a função pop_view
+                                    bgcolor="blue",
+                                    color="white"
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.END,
+                            
+                        ),
+                        
+                        #Meio para os cards  
+                        ft.Row(
+                            [
+                                homeCard(ft.Icons.SCHOOL,"TESTE"),
+                                homeCard(ft.Icons.GROUP,"Alunos")                                
+                            ]
+                        ),
+                        #final
+                        ft.Row(
+                            [
+
+                            ]
+                        )
+                    ],
+                    expand=True
+                ),
+            ],expand=True
+
+        )
+
+        #self.body.controls.append(ft.Text(value="Página de admin"))
+        self.content.route = "/aluno/home"
+        self.content.controls.append(self.body) #add corpo a view
+        return self.content
