@@ -52,27 +52,31 @@ class sidebarProf(Sidebar):
         destinations = [
             sideDestination(
                 Icons.MENU_BOOK,
-                "/aluno/biblioteca",
+                "/prof/biblioteca",
                 "Biblioteca",
             ),
             
             sideDestination(
                 Icons.MONITOR,
-                "/aluno/aulas",
+                "/prof/aulas",
                 "Aulas",
 
             ),
             sideDestination(
-                Icons.INSERT_CHART,
-                "/aluno/notas",
+                Icons.ADD_CHART,
+                "/prof/notas",
                 "Notas",
 
             ),
             sideDestination(
-                Icons.LIBRARY_BOOKS,
-                "/aluno/atividades",
-                "Atividades",
-
+                Icons.GROUPS,
+                "prof/alunos",
+                "Turmas"
+            ),
+            sideDestination(
+                Icons.POST_ADD,
+                "prof/atividades",
+                "Atividades"
             ),
             self.nrdConfigs
         ]

@@ -176,7 +176,7 @@ class views_Adm(Views):
 class views_aluno(Views):
     def __init__(self, page):
         super().__init__(page)
-        self.sidebar = sidebarAluno(self.page).rtnSide() #Recebe o navRail de Adm
+        self.sidebar = sidebarAluno(self.page).rtnSide() #Recebe o navRail de Aluno
 
     def HomeView(self):
         super().HomeView()
@@ -184,4 +184,18 @@ class views_aluno(Views):
         self.homeMeio.controls.append(homeCard(ft.Icons.INSERT_CHART,"Notas")) 
         self.homeMeio.controls.append(homeCard(ft.Icons.LIBRARY_BOOKS,"Atividades"))
         self.content.route = "/aluno/home"
+        return self.content
+    
+class views_Professor(Views):
+
+    def __init__(self, page):
+        super().__init__(page)
+        self.sidebar = sidebarProf(self.page).rtnSide()
+
+    def HomeView(self):
+        super().HomeView()
+        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
+        self.homeMeio.controls.append(homeCard(ft.Icons.CO_PRESENT,"Aulas")) 
+        self.homeMeio.controls.append(homeCard(ft.Icons.POST_ADD,"Atividades"))
+        self.content.route = "/prof/home"
         return self.content

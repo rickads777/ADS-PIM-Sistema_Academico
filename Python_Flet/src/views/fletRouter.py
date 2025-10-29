@@ -12,12 +12,14 @@ class Router:
         self.pgs = Views(self.page) #Views(Pags) como objs
         self.list_Pgs = views_Adm(self.page)
         self.teste = views_aluno(self.page)
+        self.prof_pgs = views_Professor(self.page)
         #Dicionario de endereços(Routes: View atrelada)
         self.routes = { 
             "/": self.pgs.LoginView(),
             "/home": self.pgs.HomeView(),
             "/admin/home": self.list_Pgs.HomeView(),
             "/aluno/home": self.teste.HomeView(),
+            "/prof/home": self.prof_pgs.HomeView()
         }
 
     def route_change(self):

@@ -16,9 +16,15 @@ def Login( page: ft.Page, nome: ft.TextField, senha : ft.TextField):
             senha.error_text = "Senha Incorreta"
         else:
             page.go("/aluno/home")
+    elif nome.value == "prof":
+        if senha.value != "prof":
+            senha.error_text = "Senha Incorreta"
+        else:
+            page.go("/prof/home")
     else:
         nome.error_text="Usuário Não Existe"
-
+    nome.value =""
+    senha.value=""
 
 
 #Abre ou fecha a sidebar
