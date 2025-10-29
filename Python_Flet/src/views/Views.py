@@ -28,6 +28,12 @@ class Views:
             on_click=toggle_sidebar
         )
 
+        #atributos da home
+        self.homeColunm: ft.Column = ft.Column()
+        self.homeTopo: ft.Row = ft.Row()
+        self.homeMeio: ft.Row = ft.Row()
+        self.homeFim: ft.Row = ft.Row()
+
     #funcoes para os btns
 
 
@@ -95,11 +101,7 @@ class Views:
     
     #Página Home (Testes)
     def HomeView(self):
-       #self.body = ft.Row(
-       #     [
-       #         ft.ElevatedButton("Voltar", on_click=lambda _:self.page.go("/"), )
-       #     ], expand=True
-       # )
+
         self.content = ft.View(
             #route="/home", Inserir separada nas filhas
                     controls=[
@@ -109,7 +111,48 @@ class Views:
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     
         )
-        return self.content                   
+        #Estrutura padrão da Home
+        self.homeTopo = ft.Row(
+                            [
+                                ft.ElevatedButton(
+                                    text="<<",
+                                    on_click=lambda _:self.page.go("/"), #Precisa chamar a função pop_view
+                                    bgcolor="blue",
+                                    color="white"
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.END,
+                            
+                        )
+
+        #Define o corpo da página
+        self.body = ft.Row(
+            [
+                 
+                ft.Column(
+                    [
+                        self.toggle_nav_rail_button
+                    ], 
+                    alignment=ft.MainAxisAlignment.START
+                ),
+
+                ft.Column(width=30), #Margem entre navrail e coluna
+
+                ft.Column(
+                    [
+                        #topo (btn retornar)
+                        self.homeTopo,                 
+                        #Meio para os cards  
+                        self.homeMeio,
+                        #final
+                        self.homeFim
+                    ],
+                    expand=True
+                ),
+            ],expand=True
+
+        )
+        self.content.controls.append(self.body) #add corpo a view    
     
 
 class views_Adm(Views):
@@ -122,58 +165,12 @@ class views_Adm(Views):
 
     def HomeView(self):
         super().HomeView()
-
-        #Define o corpo da página
-        self.body = ft.Row(
-            [
-                self.sidebar, 
-                ft.Column(
-                    [
-                        self.toggle_nav_rail_button
-                    ], 
-                    alignment=ft.MainAxisAlignment.START
-                ),
-
-                ft.Column(width=30), #Margem entre navrail e coluna
-
-                ft.Column(
-                    [
-                        #topo (btn retornar)
-                        ft.Row(
-                            [
-                                ft.ElevatedButton(
-                                    text="<<",
-                                    on_click=lambda _:self.page.go("/"), #Precisa chamar a função pop_view
-                                    bgcolor="blue",
-                                    color="white"
-                                )
-                            ],
-                            alignment=ft.MainAxisAlignment.END,
-                            
-                        ),
-                        
-                        #Meio para os cards  
-                        ft.Row(
-                            [
-                                homeCard(ft.Icons.SCHOOL,"Professores"),
-                                homeCard(ft.Icons.GROUP,"Alunos")                                
-                            ]
-                        ),
-                        #final
-                        ft.Row(
-                            [
-
-                            ]
-                        )
-                    ],
-                    expand=True
-                ),
-            ],expand=True
-
-        )
-
+        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
+        #Adicona os cards no home view
+        self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores")) 
+        self.homeMeio.controls.append(homeCard(ft.Icons.GROUP,"Alunos"))
         self.content.route = "/admin/home"
-        self.content.controls.append(self.body) #add corpo a view
+        
         return self.content
     
 class views_aluno(Views):
@@ -183,57 +180,8 @@ class views_aluno(Views):
 
     def HomeView(self):
         super().HomeView()
-        
-        #Define o corpo da página
-        self.body = ft.Row(
-            [
-                self.sidebar, 
-                ft.Column(
-                    [
-                        self.toggle_nav_rail_button
-                    ], 
-                    alignment=ft.MainAxisAlignment.START
-                ),
-
-                ft.Column(width=30), #Margem entre navrail e coluna
-
-                ft.Column(
-                    [
-                        #topo (btn retornar)
-                        ft.Row(
-                            [
-                                ft.ElevatedButton(
-                                    text="<<",
-                                    on_click=lambda _:self.page.go("/"), #Precisa chamar a função pop_view
-                                    bgcolor="blue",
-                                    color="white"
-                                )
-                            ],
-                            alignment=ft.MainAxisAlignment.END,
-                            
-                        ),
-                        
-                        #Meio para os cards  
-                        ft.Row(
-                            [
-                                homeCard(ft.Icons.SCHOOL,"TESTE"),
-                                homeCard(ft.Icons.GROUP,"Alunos")                                
-                            ]
-                        ),
-                        #final
-                        ft.Row(
-                            [
-
-                            ]
-                        )
-                    ],
-                    expand=True
-                ),
-            ],expand=True
-
-        )
-
-        #self.body.controls.append(ft.Text(value="Página de admin"))
+        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
+        self.homeMeio.controls.append(homeCard(ft.Icons.INSERT_CHART,"Notas")) 
+        self.homeMeio.controls.append(homeCard(ft.Icons.LIBRARY_BOOKS,"Atividades"))
         self.content.route = "/aluno/home"
-        self.content.controls.append(self.body) #add corpo a view
         return self.content
