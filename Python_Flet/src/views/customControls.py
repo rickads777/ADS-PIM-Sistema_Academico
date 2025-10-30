@@ -43,7 +43,55 @@ def homeCard(icone: ft.Icons, nome):
             )
     return card
 
-#Sidebar Constrols
+def caixaCadastro():
+    #TextFields
+    fldNome = ft.TextField(label="Nome",)
+    flUsuario = ft.TextField(label="Usuário")
+    fldSenha = ft.TextField(label="Senha",)
+    fldEmail = ft.TextField(label="E-mail",)
+    
+    #Caixa de seleção
+    Usuarios = ["Admin","Aluno","Professor"]
+    
+    ##Definir Seleções
+    optUser =[]
+    for usuario in Usuarios:
+        optUser.append(
+            ft.DropdownOption(
+                    key=usuario,
+                    content=ft.Text(
+                        value=usuario,
+                    ),
+            )
+        )
+    drpUsuario = ft.Dropdown(
+        editable=False,
+        label="Tipo de Usuário",
+        options=optUser,
+    )
+
+    caixaCadastro = ft.Row([
+            ft.Column([
+                fldNome,
+                flUsuario,
+                fldSenha,
+                fldEmail,
+                drpUsuario
+            ]),
+            ft.Column([
+
+            ])
+        ],
+    )
+    content = ft.Container(
+        content=caixaCadastro,
+        bgcolor=ft.Colors.LIGHT_BLUE_900,
+        border_radius=5,
+        padding=10
+    )
+    return content
+
+#Sidebar Controls
 
 #navRailDestination
 def sideDestination(icone: ft.Icons, rota, texto):

@@ -164,11 +164,35 @@ class views_Adm(Views):
 
 
     def HomeView(self):
-        super().HomeView()
+        super().HomeView()#Chama a estrutura padrão
+
         self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
+        
+        #Função para abrir o cadastro
+        def abrirCadastro(e):
+            ctnCadastro.visible = not ctnCadastro.visible
+            self.page.update()
+        
+        #Container que será aberto no click do cadastro
+        ctnCadastro = caixaCadastro()
+        ctnCadastro.visible = False
+        
         #Adicona os cards no home view
         self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores")) 
         self.homeMeio.controls.append(homeCard(ft.Icons.GROUP,"Alunos"))
+        self.homeFim.controls.append(
+            ft.Column(
+                [
+                    ft.FilledTonalButton(
+                        content=ft.Row([
+                        ft.Icon(name=ft.Icons.PERSON_ADD),
+                        ft.Text("Cadastrar Usuários"),
+                    ]),
+                    on_click=abrirCadastro),
+                    ctnCadastro
+                ]
+            )
+        )
         self.content.route = "/admin/home"
         
         return self.content
