@@ -1,4 +1,5 @@
 import flet as ft
+import  time
 from .funcoes import *
 from .Sidebar import *
 from .customControls import *
@@ -170,8 +171,21 @@ class views_Adm(Views):
         
         #Função para abrir o cadastro
         def abrirCadastro(e):
-            ctnCadastro.visible = not ctnCadastro.visible
-            self.page.update()
+            if ctnCadastro.visible:
+                #ctnCadastro.width = 0
+                ctnCadastro.height = 0
+                self.page.update()
+                ctnCadastro.visible = not ctnCadastro.visible
+                time.sleep(0.5)#Esperar o tempo da animação
+                self.page.update()
+            else:
+                ctnCadastro.visible = not ctnCadastro.visible
+                self.page.update()
+                time.sleep(0.1)#Pequeno delay pra animação poder começar
+                #ctnCadastro.width = 320
+                ctnCadastro.height = 300
+                self.page.update()
+                
         
         #Container que será aberto no click do cadastro
         ctnCadastro = caixaCadastro()

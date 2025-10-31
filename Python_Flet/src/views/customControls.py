@@ -46,10 +46,19 @@ def homeCard(icone: ft.Icons, nome):
 def caixaCadastro():
     #TextFields
     fldNome = ft.TextField(label="Nome",)
-    flUsuario = ft.TextField(label="Usuário")
+    fldUsuario = ft.TextField(label="Usuário")
     fldSenha = ft.TextField(label="Senha",)
     fldEmail = ft.TextField(label="E-mail",)
-    
+    fields = [fldNome,fldUsuario, fldSenha,fldEmail]
+    ##Estilização dos Fields
+    for field in fields: 
+        field.border_color = ft.Colors.WHITE
+        field.bgcolor = ft.Colors.LIGHT_BLUE_800
+        field.focused_bgcolor = ft.Colors.LIGHT_BLUE_700
+        field.color = ft.Colors.WHITE
+        field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
+        
+
     #Caixa de seleção
     Usuarios = ["Admin","Aluno","Professor"]
     
@@ -73,7 +82,7 @@ def caixaCadastro():
     caixaCadastro = ft.Row([
             ft.Column([
                 fldNome,
-                flUsuario,
+                fldUsuario,
                 fldSenha,
                 fldEmail,
                 drpUsuario
@@ -87,7 +96,10 @@ def caixaCadastro():
         content=caixaCadastro,
         bgcolor=ft.Colors.LIGHT_BLUE_900,
         border_radius=5,
-        padding=10
+        padding=10,
+        animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
+        width=320,
+        height=0
     )
     return content
 
