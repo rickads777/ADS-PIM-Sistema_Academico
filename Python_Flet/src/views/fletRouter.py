@@ -28,7 +28,8 @@ class Router:
         self.page.views.append(self.routes.get(self.page.route))
         self.page.update()
         
-
+# TESTANDO
+#Routers diferentes para as classes filhas
 class Router_Admin(Router):
     def __init__(self, page):
         super().__init__(page)
@@ -44,8 +45,7 @@ class Router_Admin(Router):
     def route_change(self):
         return super().route_change()
 
-# TESTANDO
-#Routers diferentes para as classes filhas
+
 class Router_Aluno(Router):
     def __init__(self, page):
         super().__init__(page)

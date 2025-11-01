@@ -40,7 +40,14 @@ class Sidebar():
 
         
     def rtnSide(self):
-        return self.rail #Retorna a NavRail
+        ctn = ft.Container(
+            content=self.rail,offset=(0,0),
+            animate_offset=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
+            animate_opacity=ft.Animation(400, ft.AnimationCurve.EASE_IN_OUT_BACK),
+            animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
+            width=120
+        )
+        return ctn #Retorna a NavRail
     
     
     

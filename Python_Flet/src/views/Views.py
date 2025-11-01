@@ -14,7 +14,7 @@ class Views:
         self.page = page
         self.content: ft.View #Páginas retornadas
         self.body: ft.Row #Corpo das views
-        self.sidebar: ft.NavigationRail #Sidebar que será retornada
+        self.sidebar: ft.Container #Sidebar que será retornada
         
         #botão de colapsar a sidebar 
         def toggle_sidebar(e): #função pro click
@@ -166,7 +166,7 @@ class views_Adm(Views):
 
     def HomeView(self):
         super().HomeView()#Chama a estrutura padrão
-
+        
         self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
         
         #Função para abrir o cadastro
