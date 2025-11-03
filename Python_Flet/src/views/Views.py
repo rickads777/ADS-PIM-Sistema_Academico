@@ -171,25 +171,25 @@ class views_Adm(Views):
         
         #Função para abrir o cadastro
         def abrirCadastro(e):
-            if ctnCadastro.visible:
+            if ctnCadastro.content.visible:
                 #ctnCadastro.width = 0
-                ctnCadastro.height = 0
+                ctnCadastro.content.height = 0
                 self.page.update()
-                ctnCadastro.visible = not ctnCadastro.visible
+                ctnCadastro.content.visible = not ctnCadastro.content.visible
                 time.sleep(0.5)#Esperar o tempo da animação
                 self.page.update()
             else:
-                ctnCadastro.visible = not ctnCadastro.visible
+                ctnCadastro.content.visible = not ctnCadastro.content.visible
                 self.page.update()
                 time.sleep(0.1)#Pequeno delay pra animação poder começar
+                ctnCadastro.content.height = 300
                 #ctnCadastro.width = 320
-                ctnCadastro.height = 300
                 self.page.update()
                 
         
         #Container que será aberto no click do cadastro
-        ctnCadastro = caixaCadastro(self.page)
-        ctnCadastro.visible = False
+        ctnCadastro = caixaCadastros(self.page)
+        ctnCadastro.content.visible = False
         
         #Adicona os cards no home view
         self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores")) 
@@ -203,7 +203,7 @@ class views_Adm(Views):
                         ft.Text("Cadastrar Usuários"),
                     ]),
                     on_click=abrirCadastro),
-                    ctnCadastro
+                    ctnCadastro.content
                 ]
             )
         )

@@ -6,6 +6,8 @@ CREATE TABLE Admin (
 	idAdmin INT NOT NULL AUTO_INCREMENT,
     nome varchar(50),
     senha varchar(50),
+    usuario varchar(50),
+    email varchar(50),
     PRIMARY KEY (idAdmin)
 );
 
@@ -20,11 +22,13 @@ CREATE TABLE Professor(
 
 CREATE TABLE Turma(
 	idTurma INT NOT NULL AUTO_INCREMENT,
+    idProfessor INT NOT NULL,
     nomeTurma varchar(50),
     período varchar(50),
     anoLetivo datetime,
     email varchar(50),
-    PRIMARY KEY (idTurma)
+    PRIMARY KEY (idTurma),
+    FOREIGN KEY(idProfessor) REFERENCES Professor(idProfessor)
 );
 CREATE TABLE Aluno(
 	idAluno INT NOT NULL AUTO_INCREMENT,
@@ -79,4 +83,6 @@ CREATE TABLE Aluno_Atividade(
     PRIMARY KEY (idAluno_Atividade),
     FOREIGN KEY(idAluno) REFERENCES Aluno(idAluno),
     FOREIGN KEY(idAtividade) REFERENCES Atividade(idAtividade)
-)
+);
+
+insert into Admin (nome, usuario, email, senha) values ("Cadastro0","admin","email@email.com", "admin"); 

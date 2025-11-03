@@ -1,5 +1,6 @@
 import flet as ft
 from .funcoes import *
+from config import cxCadastro_maxHeight
 
 #Home Controls
 
@@ -44,97 +45,116 @@ def homeCard(icone: ft.Icons, nome):
             )
     return card
 
-def caixaCadastro(page :ft.Page):
-    # TextFields
-    fldNome = ft.TextField(label="Nome",)
-    fldUsuario = ft.TextField(label="Usuário")
-    fldSenha = ft.TextField(label="Senha",)
-    fldEmail = ft.TextField(label="E-mail",)
-    fields = [fldNome,fldUsuario, fldSenha,fldEmail]
-    ## Estilização dos Fields
-    for field in fields: 
-        field.border_color = ft.Colors.WHITE
-        field.bgcolor = ft.Colors.LIGHT_BLUE_800
-        field.focused_bgcolor = ft.Colors.LIGHT_BLUE_700
-        field.color = ft.Colors.WHITE
-        field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
-
-    # Caixa de seleção
-    Usuarios = ["Admin","Aluno","Professor"]    
-   
-    ## Definir Seleções
-    optUser =[]
-    for usuario in Usuarios:
-        optUser.append(
-            ft.DropdownOption(
-                    key=usuario,
-                    content=ft.Text(
-                        value=usuario,
-                    ),
-            )
-        )
-    drpUsuario = ft.Dropdown(
-        editable=False,
-        label="Tipo de Usuário",
-        options=optUser,
-    )
-    # Funções para o Clique    
-    # Limpar
-    def Limpar(e):
-        for field in fields:
-            field.value = ""
+class caixaCadastros():
+    def __init__(self, page :ft.Page):    
+        self.page = page
+        # TextFields
+        self.fldNome = ft.TextField(label="Nome",)
+        self.fldUsuario = ft.TextField(label="Usuário")
+        self.fldSenha = ft.TextField(label="Senha",)
+        self.fldEmail = ft.TextField(label="E-mail",)
+        self.fields = [self.fldNome,self.fldUsuario, self.fldSenha, self.fldEmail]
+        ## Estilização dos Fields
+        for field in self.fields: 
             field.border_color = ft.Colors.WHITE
-        drpUsuario.value = ""
-        page.update()
-    ## Salvar
-    def Salvar(e):
-        verficacao = False #Controle de se existe algo nulo
-        for field in fields:
-            if field.value == '':
-                field.border_color = ft.Colors.RED
-                verficacao = True
-        if verficacao:
-            page.update()
-            return
-        else:
-            cadastrar_Usuario(drpUsuario.value, fldNome.value, fldUsuario.value, fldSenha.value, fldEmail.value)
-            Limpar(e)
+            field.bgcolor = ft.Colors.LIGHT_BLUE_800
+            field.focused_bgcolor = ft.Colors.LIGHT_BLUE_700
+            field.color = ft.Colors.WHITE
+            field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
 
-    caixaCadastro = ft.Row([
-            ft.Column([
-                fldNome,
-                fldUsuario,
-                fldSenha,
-                fldEmail,
-                ft.Row([
-                    drpUsuario,
+        # Dropdown p/ selecionar usuarios
+        ## Opções
+        Usuarios = ["Admin","Aluno","Professor"]    
+    
+        ## Definir Seleções como lista de options q será adicionado
+        optUser =[]
+        for usuario in Usuarios:
+            optUser.append(
+                ft.DropdownOption(
+                        key=usuario,
+                        content=ft.Text(
+                            value=usuario,
+                        ),
+                )
+            )
+        self.drpUsuario = ft.Dropdown(
+            editable=False,
+            label="Tipo de Usuário",
+            options=optUser,
+        )
+        #Dropdown para selecionar turmas
+        self.drpTurmas: ft.dropdown = ft.Dropdown(
+            label="Turmas",
+            enable_filter=True
+        )
+        self.caixaCadastro = ft.Row([
+                ft.Column([
+                    self.fldNome,
+                    self.fldUsuario,
+                    self.fldSenha,
+                    self.fldEmail,
                     ft.Row([
-                        ft.IconButton(icon=ft.Icons.CHECK_CIRCLE, icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
-                                      on_click= Salvar
-                                      ),
-                        ft.IconButton(icon=ft.Icons.CANCEL,icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
-                                      on_click= Limpar
-                                      )
-                    ], alignment=ft.MainAxisAlignment.CENTER, expand=True
-                    )
+                        self.drpUsuario,
+                        ft.Row([
+                            ft.IconButton(icon=ft.Icons.CHECK_CIRCLE, icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
+                                        on_click= self.Salvar
+                                        ),
+                            ft.IconButton(icon=ft.Icons.CANCEL,icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
+                                        on_click= self.Limpar
+                                        )
+                        ], alignment=ft.MainAxisAlignment.CENTER, expand=True
+                        )
+                    ], expand=True
+                    ),
+                    
                 ], expand=True
                 ),
-                
-            ], expand=True
-            ),
-        ],expand=True
-    )
-    content = ft.Container(
-        content=caixaCadastro,
-        bgcolor=ft.Colors.LIGHT_BLUE_900,
-        border_radius=5,
-        padding=10,
-        animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
-        width=320,
-        height=0
-    )
-    return content
+            ],expand=True
+        )
+        self.content :ft.Container = ft.Container(
+            content=self.caixaCadastro,
+            bgcolor=ft.Colors.LIGHT_BLUE_900,
+            border_radius=5,
+            padding=10,
+            animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
+            width=320,
+            height=0
+        )
 
+    # Funções para o Clique    
+    ## Limpar os cam
+    def Limpar(self, e):
+        for field in self.fields:
+            field.value = ""
+            field.border_color = ft.Colors.WHITE
+        self.drpUsuario.value = ""
+        self.page.update()
+    ## Salvar
+    def Salvar(self,e):
+        verficacao = False #Controle de se existe algo nulo
+        for field in self.fields:
+            if field.value == '':
+                field.border_color = ft.Colors.RED
+                verficacao = True 
+        if self.drpUsuario.value == '' or None:
+            verficacao = True
+        if verficacao:
+            self.page.update()
+            return
+        else:
+            cadastrar_Usuario(self.drpUsuario.value, self.fldNome.value, self.fldUsuario.value, self.fldSenha.value, self.fldEmail.value)
+            self.Limpar(e)
+    # Função on_change
+    ## Mostrar Turmas
+    def muda_Drop(self, e):
+        if self.drpUsuario.value == "Aluno":
+            self.content.height =330
+        else:
+            self.content.height =300
+        self.page.update()
+
+    def retornaCtnCadastro(self):
+        return self.content
 #Sidebar Controls
 
 #navRailDestination
