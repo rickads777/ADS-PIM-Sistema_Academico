@@ -188,7 +188,7 @@ class views_Adm(Views):
                 
         
         #Container que será aberto no click do cadastro
-        ctnCadastro = caixaCadastro()
+        ctnCadastro = caixaCadastro(self.page)
         ctnCadastro.visible = False
         
         #Adicona os cards no home view

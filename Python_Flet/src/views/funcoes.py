@@ -1,6 +1,6 @@
 import flet as ft
-import time
-#Variáveis de Controle
+from .conexao  import *
+
 #Variáveis de controle
 
 def Login( page: ft.Page, nome: ft.TextField, senha : ft.TextField):
@@ -41,3 +41,10 @@ def controle_Sidebar(page: ft.Page, sidebar:  ft.Container):
     page.update()
 
 
+#Admin
+##Cadastrar Usuários
+
+def cadastrar_Usuario(tipo: str, nome, usuario, senha, email):
+    comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")'
+    cursor.execute(comando)
+    connection.commit()

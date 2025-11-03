@@ -1,4 +1,5 @@
 import flet as ft
+from .funcoes import *
 
 #Home Controls
 
@@ -43,26 +44,25 @@ def homeCard(icone: ft.Icons, nome):
             )
     return card
 
-def caixaCadastro():
-    #TextFields
+def caixaCadastro(page :ft.Page):
+    # TextFields
     fldNome = ft.TextField(label="Nome",)
     fldUsuario = ft.TextField(label="Usuário")
     fldSenha = ft.TextField(label="Senha",)
     fldEmail = ft.TextField(label="E-mail",)
     fields = [fldNome,fldUsuario, fldSenha,fldEmail]
-    ##Estilização dos Fields
+    ## Estilização dos Fields
     for field in fields: 
         field.border_color = ft.Colors.WHITE
         field.bgcolor = ft.Colors.LIGHT_BLUE_800
         field.focused_bgcolor = ft.Colors.LIGHT_BLUE_700
         field.color = ft.Colors.WHITE
         field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
-        
 
-    #Caixa de seleção
-    Usuarios = ["Admin","Aluno","Professor"]
-    
-    ##Definir Seleções
+    # Caixa de seleção
+    Usuarios = ["Admin","Aluno","Professor"]    
+   
+    ## Definir Seleções
     optUser =[]
     for usuario in Usuarios:
         optUser.append(
@@ -78,6 +78,27 @@ def caixaCadastro():
         label="Tipo de Usuário",
         options=optUser,
     )
+    # Funções para o Clique    
+    # Limpar
+    def Limpar(e):
+        for field in fields:
+            field.value = ""
+            field.border_color = ft.Colors.WHITE
+        drpUsuario.value = ""
+        page.update()
+    ## Salvar
+    def Salvar(e):
+        verficacao = False #Controle de se existe algo nulo
+        for field in fields:
+            if field.value == '':
+                field.border_color = ft.Colors.RED
+                verficacao = True
+        if verficacao:
+            page.update()
+            return
+        else:
+            cadastrar_Usuario(drpUsuario.value, fldNome.value, fldUsuario.value, fldSenha.value, fldEmail.value)
+            Limpar(e)
 
     caixaCadastro = ft.Row([
             ft.Column([
@@ -85,12 +106,23 @@ def caixaCadastro():
                 fldUsuario,
                 fldSenha,
                 fldEmail,
-                drpUsuario
-            ]),
-            ft.Column([
-
-            ])
-        ],
+                ft.Row([
+                    drpUsuario,
+                    ft.Row([
+                        ft.IconButton(icon=ft.Icons.CHECK_CIRCLE, icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
+                                      on_click= Salvar
+                                      ),
+                        ft.IconButton(icon=ft.Icons.CANCEL,icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
+                                      on_click= Limpar
+                                      )
+                    ], alignment=ft.MainAxisAlignment.CENTER, expand=True
+                    )
+                ], expand=True
+                ),
+                
+            ], expand=True
+            ),
+        ],expand=True
     )
     content = ft.Container(
         content=caixaCadastro,

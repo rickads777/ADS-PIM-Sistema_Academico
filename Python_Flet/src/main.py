@@ -7,7 +7,6 @@ nomeApp = "EducaZone"
 def main(page: ft.Page):
     page.title = nomeApp
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-    page.padding = 0
     router = Router(page)
 
     #Capturar altura e largura do app
