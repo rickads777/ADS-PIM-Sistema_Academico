@@ -44,7 +44,10 @@ def controle_Sidebar(page: ft.Page, sidebar:  ft.Container):
 #Admin
 ##Cadastrar Usuários
 
-def cadastrar_Usuario(tipo: str, nome, usuario, senha, email):
-    comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")'
+def cadastrar_Usuario(tipo: str, nome, usuario, senha, email, idturma = None):
+    if idturma != None:
+        comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email, idTurma) VALUES ("{nome}", "{usuario}", "{senha}", "{email}", {int(idturma)})'
+    else:
+        comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")'
     cursor.execute(comando)
     connection.commit()

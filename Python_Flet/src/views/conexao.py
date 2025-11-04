@@ -9,3 +9,8 @@ connection = mysql.connector.connect(
 cursor = connection.cursor()
 
 #Exemplo Create
+#Select
+
+def select_DB (table, colunas):
+    cursor.execute(f'SELECT {colunas} FROM {table}')
+    return cursor.fetchall()

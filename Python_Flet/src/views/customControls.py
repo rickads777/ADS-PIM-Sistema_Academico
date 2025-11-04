@@ -81,11 +81,19 @@ class caixaCadastros():
             editable=False,
             label="Tipo de Usuário",
             options=optUser,
+            on_change= self.muda_Drop,
+            border_color= ft.Colors.WHITE,
+            color=ft.Colors.WHITE
         )
         #Dropdown para selecionar turmas
-        self.drpTurmas: ft.dropdown = ft.Dropdown(
+        self.drpTurmas: ft.Dropdown = ft.Dropdown(
             label="Turmas",
-            enable_filter=True
+            enable_filter=True,
+            visible=False,
+            width=310,
+            enable_search=True,
+            border_color= ft.Colors.WHITE,
+            color=ft.Colors.WHITE
         )
         self.caixaCadastro = ft.Row([
                 ft.Column([
@@ -93,6 +101,7 @@ class caixaCadastros():
                     self.fldUsuario,
                     self.fldSenha,
                     self.fldEmail,
+                    self.drpTurmas,
                     ft.Row([
                         self.drpUsuario,
                         ft.Row([
@@ -122,12 +131,14 @@ class caixaCadastros():
         )
 
     # Funções para o Clique    
-    ## Limpar os cam
+    ## Limpar os campos
     def Limpar(self, e):
         for field in self.fields:
             field.value = ""
             field.border_color = ft.Colors.WHITE
         self.drpUsuario.value = ""
+        self.drpUsuario.border_color = ft.Colors.WHITE
+        self.drpTurmas.border_color = ft.Colors.WHITE
         self.page.update()
     ## Salvar
     def Salvar(self,e):
@@ -138,19 +149,26 @@ class caixaCadastros():
                 verficacao = True 
         if self.drpUsuario.value == '' or None:
             verficacao = True
+            self.drpUsuario.border_color = ft.Colors.RED
+        if self.drpUsuario.value == "Aluno" and self.drpTurmas.value == None:
+            verficacao = True
+            self.drpTurmas.border_color = ft.Colors.RED
         if verficacao:
             self.page.update()
             return
         else:
-            cadastrar_Usuario(self.drpUsuario.value, self.fldNome.value, self.fldUsuario.value, self.fldSenha.value, self.fldEmail.value)
+            cadastrar_Usuario(self.drpUsuario.value, self.fldNome.value, self.fldUsuario.value, self.fldSenha.value, self.fldEmail.value, self.drpTurmas.value)
             self.Limpar(e)
     # Função on_change
     ## Mostrar Turmas
     def muda_Drop(self, e):
         if self.drpUsuario.value == "Aluno":
-            self.content.height =330
+            self.content.height =355
+            self.drpTurmas.visible = True
         else:
             self.content.height =300
+            self.drpTurmas.visible = False
+            self.drpTurmas.value = None
         self.page.update()
 
     def retornaCtnCadastro(self):

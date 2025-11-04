@@ -180,9 +180,18 @@ class views_Adm(Views):
                 self.page.update()
             else:
                 ctnCadastro.content.visible = not ctnCadastro.content.visible
+                listTurmas = select_DB("Turma","idTurma,nome")
+                ctnCadastro.drpTurmas.options = None
+                for i, turma in enumerate(listTurmas): #For com Index
+                    ctnCadastro.drpTurmas.options.append(
+                        ft.DropdownOption(
+                            key=turma[i],
+                            text=turma[i + 1]
+                        )
+                    )  
                 self.page.update()
                 time.sleep(0.1)#Pequeno delay pra animação poder começar
-                ctnCadastro.content.height = 300
+                ctnCadastro.muda_Drop(e)
                 #ctnCadastro.width = 320
                 self.page.update()
                 
