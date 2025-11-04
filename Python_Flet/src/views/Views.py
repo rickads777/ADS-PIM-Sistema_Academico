@@ -14,7 +14,7 @@ class Views:
         self.page = page
         self.content: ft.View #Páginas retornadas
         self.body: ft.Row #Corpo das views
-        self.sidebar: ft.Container #Sidebar que será retornada
+        self.sidebar: ft.Container = ft.Container #Sidebar que será retornada
         
         #botão de colapsar a sidebar 
         def toggle_sidebar(e): #função pro click
@@ -153,6 +153,7 @@ class Views:
             ],expand=True
 
         )
+        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
         self.content.controls.append(self.body) #add corpo a view    
     
 
@@ -160,14 +161,13 @@ class views_Adm(Views):
 
     def __init__(self, page):
         super().__init__(page)
+        #Adiciona a sidebar específica
         self.sidebar = sidebarAdmin(self.page).rtnSide() #Recebe o navRail de Adm
         
 
 
     def HomeView(self):
         super().HomeView()#Chama a estrutura padrão
-        
-        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
         
         #Função para abrir o cadastro
         def abrirCadastro(e):
@@ -182,11 +182,11 @@ class views_Adm(Views):
                 ctnCadastro.content.visible = not ctnCadastro.content.visible
                 listTurmas = select_DB("Turma","idTurma,nome")
                 ctnCadastro.drpTurmas.options = None
-                for i, turma in enumerate(listTurmas): #For com Index
+                for id, turma in listTurmas: #For com Index
                     ctnCadastro.drpTurmas.options.append(
                         ft.DropdownOption(
-                            key=turma[i],
-                            text=turma[i + 1]
+                            key=id,
+                            text=turma
                         )
                     )  
                 self.page.update()
@@ -203,6 +203,7 @@ class views_Adm(Views):
         #Adicona os cards no home view
         self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores")) 
         self.homeMeio.controls.append(homeCard(ft.Icons.GROUP,"Alunos"))
+        self.homeMeio.controls.append(homeCard(ft.Icons.CLASS_,"Turmas"))
         self.homeFim.controls.append(
             ft.Column(
                 [

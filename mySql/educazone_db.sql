@@ -23,10 +23,9 @@ CREATE TABLE Professor(
 CREATE TABLE Turma(
 	idTurma INT NOT NULL AUTO_INCREMENT,
     idProfessor INT NOT NULL,
-    nomeTurma varchar(50),
-    período varchar(50),
-    anoLetivo datetime,
-    email varchar(50),
+    nome varchar(50),
+    periodo varchar(50),
+    anoLetivo int,
     PRIMARY KEY (idTurma),
     FOREIGN KEY(idProfessor) REFERENCES Professor(idProfessor)
 );
@@ -86,3 +85,5 @@ CREATE TABLE Aluno_Atividade(
 );
 
 insert into Admin (nome, usuario, email, senha) values ("Cadastro0","admin","email@email.com", "admin"); 
+insert into Professor (nome, usuario, email, senha) values ("Sr.Teste","prof","email@email.com", "prof"); 
+insert into Turma (idprofessor,nome, periodo, anoletivo) values (1,"A","Tarde",2025); 
