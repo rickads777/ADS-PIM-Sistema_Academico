@@ -176,14 +176,18 @@ class caixaCadastros():
 #Sidebar Controls
 
 #navRailDestination
-def sideDestination(icone: ft.Icons, rota, texto):
-    cor = ft.Colors.WHITE
+class sideDestination:
+    def __init__(self, icone: ft.Icons, rota, texto):    
+        
+        self.rota = rota
+        self.texto =texto
+        self.icone = icone
+        cor = ft.Colors.WHITE
 
-    nav = ft.NavigationRailDestination(
-                icon=ft.Icon(name=icone),
-                label=rota,
-                label_content=ft.Text(value=texto, color=cor),
-                selected_icon=ft.Icon(name=icone, color=cor),
+        self.nav = ft.NavigationRailDestination(
+                    icon=ft.Icon(name=self.icone),
+                    label=self.rota,
+                    label_content=ft.Text(value=self.texto, color=cor),
+                    selected_icon=ft.Icon(name=self.icone, color=cor),
 
-            )
-    return nav
+                )

@@ -14,12 +14,12 @@ class Views:
         self.page = page
         self.content: ft.View #Páginas retornadas
         self.body: ft.Row #Corpo das views
-        self.sidebar: ft.Container = ft.Container #Sidebar que será retornada
+        self.sidebar: Sidebar = Sidebar(self.page) #Sidebar que será retornada
         
         #botão de colapsar a sidebar 
         def toggle_sidebar(e): #função pro click
             self.toggle_nav_rail_button.selected = not self.toggle_nav_rail_button.selected
-            controle_Sidebar(self.page, self.sidebar)
+            controle_Sidebar(self.page, self.sidebar.ctn)
 
         self.toggle_nav_rail_button = ft.IconButton(
             icon=ft.Icons.ARROW_CIRCLE_LEFT,
@@ -28,15 +28,25 @@ class Views:
             selected_icon=ft.Icons.ARROW_CIRCLE_RIGHT,
             on_click=toggle_sidebar
         )
+        
 
-        #atributos da home
-        self.homeColunm: ft.Column = ft.Column()
+        #Atributos da home
+        #self.homeColunm: ft.Column = ft.Column()
         self.homeTopo: ft.Row = ft.Row()
         self.homeMeio: ft.Row = ft.Row()
         self.homeFim: ft.Row = ft.Row()
+        
+        #Atributos das TableViews
+        self.Tabela: ft.DataTable
 
     #funcoes para os btns
-
+    def view_pop(self, e: ViewPopEvent): #Voltar a páginas/ Testar melhor quando tiver mais
+            self.page.views.pop() #Remove pag atual
+            try:
+                topView: View = self.page.views[-1]
+                self.page.go(topView.route) #Pega a rota da anterior e vai
+            except:
+                self.page.go("/")
 
     #Páginas(Views)
 
@@ -102,6 +112,7 @@ class Views:
     
     #Página Home (Testes)
     def HomeView(self):
+        self.homeMeio.controls = None
 
         self.content = ft.View(
             #route="/home", Inserir separada nas filhas
@@ -117,7 +128,7 @@ class Views:
                             [
                                 ft.ElevatedButton(
                                     text="<<",
-                                    on_click=lambda _:self.page.go("/"), #Precisa chamar a função pop_view
+                                    on_click=self.view_pop, #Precisa chamar a função pop_view
                                     bgcolor="blue",
                                     color="white"
                                 )
@@ -153,16 +164,26 @@ class Views:
             ],expand=True
 
         )
-        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
+        self.body.controls.insert(0, self.sidebar.ctn) #Adiciona sidebar primeiro
         self.content.controls.append(self.body) #add corpo a view    
-    
+    #Páginas de mostrar Tabelas
+    def TableView(self):
+        self.HomeView()
+        self.Tabela = ft.DataTable(
+            columns=[]
+        )
+        self.sidebar.rail.selected_index = 2
+        self.homeMeio.controls = [self.Tabela]
+        self.homeFim.controls = None
+
+
 
 class views_Adm(Views):
 
     def __init__(self, page):
         super().__init__(page)
         #Adiciona a sidebar específica
-        self.sidebar = sidebarAdmin(self.page).rtnSide() #Recebe o navRail de Adm
+        self.sidebar =sidebarAdmin(self.page) #Recebe o navRail de Adm
         
 
 
@@ -221,14 +242,26 @@ class views_Adm(Views):
         
         return self.content
     
+    def tabProfessores_View(self):
+        super().TableView()
+        colunas= ["RP", "Nome", "Email", "Materias"]
+        for coluna in colunas:
+            self.Tabela.columns.append(
+                ft.DataColumn(
+                    ft.Text(coluna)
+                )
+            )
+        self.sidebar.rail.selected_index = 2
+        self.content.route ="/admin/professores"
+        return self.content
+
 class views_aluno(Views):
     def __init__(self, page):
         super().__init__(page)
-        self.sidebar = sidebarAluno(self.page).rtnSide() #Recebe o navRail de Aluno
+        self.sidebar = sidebarAluno(self.page) #Recebe o navRail de Aluno
 
     def HomeView(self):
         super().HomeView()
-        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
         self.homeMeio.controls.append(homeCard(ft.Icons.INSERT_CHART,"Notas")) 
         self.homeMeio.controls.append(homeCard(ft.Icons.LIBRARY_BOOKS,"Atividades"))
         self.content.route = "/aluno/home"
@@ -238,11 +271,10 @@ class views_Professor(Views):
 
     def __init__(self, page):
         super().__init__(page)
-        self.sidebar = sidebarProf(self.page).rtnSide()
+        self.sidebar = sidebarProf(self.page)
 
     def HomeView(self):
         super().HomeView()
-        self.body.controls.insert(0, self.sidebar) #Adiciona sidebar primeiro
         self.homeMeio.controls.append(homeCard(ft.Icons.CO_PRESENT,"Aulas")) 
         self.homeMeio.controls.append(homeCard(ft.Icons.POST_ADD,"Atividades"))
         self.content.route = "/prof/home"
