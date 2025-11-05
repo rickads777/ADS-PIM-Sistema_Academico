@@ -191,3 +191,47 @@ class sideDestination:
                     selected_icon=ft.Icon(name=self.icone, color=cor),
 
                 )
+
+#Tabela Genérica, padrão para as subclasses
+class Tabela():
+    def __init__(self, nomeTabela: str, colunas: list, linhas: str ):
+        self.nomeTabela = nomeTabela
+        self.colunas = colunas
+        self.colunas.append("") #Adiciona coluna sem nada, pra ficar os botões
+        self.linhas = linhas
+        self.Tab: ft.DataTable = ft.DataTable (columns=[])
+        for coluna in self.colunas:
+            self.Tab.columns.append(
+                ft.DataColumn(
+                    ft.Text(coluna)
+                )
+            )
+        
+    
+
+class Tab_profs(Tabela):
+    def __init__(self, nomeTabela, colunas, linhas):
+        super().__init__(nomeTabela, colunas, linhas)
+        self.btnEditar = ft.IconButton(icon=ft.Icons.EDIT)
+        self.btnExcluir = ft.IconButton(icon=ft.Icons.DELETE)
+        self.criarLinhas()
+
+    def criarLinhas(self):
+        #Seleciona as linhas da tabela
+        linhas_dtTble = select_DB(self.nomeTabela,self.linhas)
+
+        for id,nome,email in linhas_dtTble:
+            materias = generic_Select_DB(f"select m.nome from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where p.idprofessor = {id}")
+            mat_prof = ", ".join(f'{materia}'.strip("()\',") for materia in materias)
+            
+            self.Tab.rows.append(
+                ft.DataRow(
+                    cells=[
+                        ft.DataCell(ft.Text(id)),
+                        ft.DataCell(ft.Text(nome)),
+                        ft.DataCell(ft.Text(email)),
+                        ft.DataCell(ft.Text(mat_prof)),
+                        ft.DataCell(ft.Row([self.btnEditar, self.btnExcluir]))
+                    ]
+                )
+            )

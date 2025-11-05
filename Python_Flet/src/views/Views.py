@@ -169,10 +169,6 @@ class Views:
     #Páginas de mostrar Tabelas
     def TableView(self):
         self.HomeView()
-        self.Tabela = ft.DataTable(
-            columns=[]
-        )
-        self.sidebar.rail.selected_index = 2
         self.homeMeio.controls = [self.Tabela]
         self.homeFim.controls = None
 
@@ -243,15 +239,14 @@ class views_Adm(Views):
         return self.content
     
     def tabProfessores_View(self):
-        super().TableView()
         colunas= ["RP", "Nome", "Email", "Materias"]
-        for coluna in colunas:
-            self.Tabela.columns.append(
-                ft.DataColumn(
-                    ft.Text(coluna)
-                )
-            )
-        self.sidebar.rail.selected_index = 2
+        linhas = "idProfessor, nome, email"
+        nsei = Tab_profs("Professor", colunas, linhas)
+        self.Tabela = nsei.Tab
+        
+        #chama a construção padrão
+        super().TableView()
+        
         self.content.route ="/admin/professores"
         return self.content
 

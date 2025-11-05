@@ -41,7 +41,7 @@ CREATE TABLE Aluno(
 );
 CREATE TABLE Materia(
 	idMateria INT NOT NULL AUTO_INCREMENT,
-    nomeMateria varchar(30),
+    nome varchar(30),
     PRIMARY KEY (idMateria)
 );
 CREATE TABLE Aula(
@@ -87,3 +87,5 @@ CREATE TABLE Aluno_Atividade(
 insert into Admin (nome, usuario, email, senha) values ("Cadastro0","admin","email@email.com", "admin"); 
 insert into Professor (nome, usuario, email, senha) values ("Sr.Teste","prof","email@email.com", "prof"); 
 insert into Turma (idprofessor,nome, periodo, anoletivo) values (1,"A","Tarde",2025); 
+insert into Materia (nome) values ("Ciência"); 
+insert into Professor_Materia (idProfessor, idmateria) values (1,1);
