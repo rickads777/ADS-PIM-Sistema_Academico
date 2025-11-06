@@ -218,7 +218,7 @@ class views_Adm(Views):
         ctnCadastro.content.visible = False
         
         #Adicona os cards no home view
-        self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores")) 
+        self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores", self.page, "/admin/professores", self.sidebar.rail, 2)) 
         self.homeMeio.controls.append(homeCard(ft.Icons.GROUP,"Alunos"))
         self.homeMeio.controls.append(homeCard(ft.Icons.CLASS_,"Turmas"))
         self.homeFim.controls.append(
