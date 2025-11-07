@@ -152,9 +152,10 @@ class caixaCadastros():
     ## Limpar os campos
     def Limpar(self, e):
         for field in self.fields:
-            field.value = ""
+            if field.label != "Usuário":
+                field.value = ""
             field.border_color = ft.Colors.WHITE
-        self.drpUsuario.value = ""
+        self.muda_Drop(e)
         self.drpUsuario.border_color = ft.Colors.WHITE
         self.drpTurmas.border_color = ft.Colors.WHITE
         check: ft.Checkbox
@@ -170,10 +171,11 @@ class caixaCadastros():
         elif self.drpUsuario.value == "Professor":
             check: ft.Checkbox
             for check in self.alertMaterias.alertBody.controls:
-                if check.value:
-                    break
-                else:
+                if not check.value:
                     verficacao = True
+                else:
+                    verficacao = False
+                    break
         for field in self.fields:
             if field.value == '':
                 field.border_color = ft.Colors.RED
@@ -185,7 +187,10 @@ class caixaCadastros():
             self.page.update()
             return
         else:
-            cadastrar_Usuario(self.drpUsuario.value, self.fldNome.value, self.fldUsuario.value, self.fldSenha.value, self.fldEmail.value, self.drpTurmas.value)
+            cadastrar_Usuario(self.drpUsuario.value, self.fldNome.value, self.fldUsuario.value, self.fldSenha.value, self.fldEmail.value, self.drpTurmas.value, self.alertMaterias.Materias_Escolhidas, self.maior_idProfessor)
+            self.maior_idProfessor = select_Maior("professor","idprofessor")
+            self.maior_idAdmin = select_Maior("admin","idadmin")
+            self.maior_idAluno = select_Maior("aluno","idaluno")
             self.Limpar(e)
     # Função on_change
     ## Mostrar Turmas
@@ -208,7 +213,6 @@ class caixaCadastros():
             self.btnSlct_Materia.visible = False
             self.fldUsuario.value = None
             
-        
         self.page.update()
 
     def retornaCtnCadastro(self):

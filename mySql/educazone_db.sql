@@ -29,6 +29,13 @@ CREATE TABLE Turma(
     PRIMARY KEY (idTurma),
     FOREIGN KEY(idProfessor) REFERENCES Professor(idProfessor)
 );
+CREATE TABLE Professor_Turma(
+    idProfessor int,
+    idTurma int,
+    FOREIGN KEY(idProfessor) REFERENCES Professor(idProfessor),
+    FOREIGN KEY(idTurma) REFERENCES Turma(idTurma)
+    
+);
 CREATE TABLE Aluno(
 	idAluno INT NOT NULL AUTO_INCREMENT,
     idTurma INT NOT NULL,
@@ -37,7 +44,7 @@ CREATE TABLE Aluno(
     senha varchar(50),
     email varchar(50),
     PRIMARY KEY (idAluno),
-    FOREIGN KEY(idAluno) REFERENCES Turma(idTurma)
+    FOREIGN KEY(idTurma) REFERENCES Turma(idTurma)
 );
 CREATE TABLE Materia(
 	idMateria INT NOT NULL AUTO_INCREMENT,
@@ -89,3 +96,34 @@ insert into Professor (nome, usuario, email, senha) values ("Sr.Teste","prof","e
 insert into Turma (idprofessor,nome, periodo, anoletivo) values (1,"A","Tarde",2025); 
 insert into Materia (nome) values ("Ciência"); 
 insert into Professor_Materia (idProfessor, idmateria) values (1,1);
+insert into Materia (nome) values ("Ciências  Humanas"); 
+insert into Professor_Materia (idProfessor, idmateria) values (1,2);
+select * from Professor as p inner join Professor_materia as mp on p.idprofessor = mp.idprofessor inner join materia as m on m.idmateria = mp.idmateria;
+select m.nome from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where p.idprofessor = 1;
+
+select * from professor_materia;
+select * from aluno;
+
+INSERT INTO Materia (nome) VALUES
+('Matemática'),
+('Português'),
+('História'),
+('Geografia'),
+('Física'),
+('Química'),
+('Biologia'),
+('Educação Física'),
+('Inglês');
+
+INSERT INTO Materia (nome) VALUES
+('Artes'),
+('Filosofia'),
+('Sociologia'),
+('Tecnologia da Informação'),
+('Programação'),
+('Robótica'),
+('Música'),
+('Literatura'),
+('Empreendedorismo'),
+('Educação Financeira');
+

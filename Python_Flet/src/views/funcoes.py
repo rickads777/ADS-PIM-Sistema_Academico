@@ -46,10 +46,12 @@ def controle_Sidebar(page: ft.Page, sidebar:  ft.Container):
 
 def cadastrar_Usuario(tipo: str, nome, usuario, senha, email, idturma = None, lstMaterias = None, idProfessor = None):
     if idturma != None:
-        comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email, idTurma) VALUES ("{nome}", "{usuario}", "{senha}", "{email}", {int(idturma)})'
-    elif lstMaterias != None:
-        comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")'
+        cursor.execute(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email, idTurma) VALUES ("{nome}", "{usuario}", "{senha}", "{email}", {int(idturma)})')
+    elif lstMaterias != None: # Professor sendo cadastrado
+        cursor.execute(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
+        for materia in lstMaterias:
+            cursor.execute(f'INSERT INTO Professor_Materia (idprofessor, idmateria) VALUES ({idProfessor+1}, {materia})')
+
     else:
-        comando = f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")'
-    cursor.execute(comando)
+        cursor.execute(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
     connection.commit()
