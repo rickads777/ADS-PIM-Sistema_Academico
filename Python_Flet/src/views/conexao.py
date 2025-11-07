@@ -23,3 +23,12 @@ def select_Unicos_DB (table, colunas):
 def generic_Select_DB(comando):
     cursor.execute(comando)
     return cursor.fetchall()
+
+def select_Maior(table, coluna):
+    cursor.execute(f'SELECT MAX({coluna}) FROM {table}')
+    num = str(cursor.fetchall()[0])
+    num = num.strip("(\'),")
+    try:
+        return int(num)
+    except:
+        return 0

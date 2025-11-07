@@ -9,11 +9,17 @@ class Router:
     
     def __init__(self, page: ft.Page):
         self.page = page
-        self.pgs = Views(self.page) #Views(Pags) como objs
-        self.adm_Pgs = views_Adm(self.page)
-        self.aluno_pgs = views_aluno(self.page)
-        self.prof_pgs = views_Professor(self.page)
+        #Views(Pags) como objs N Erro no botão de voltar
+        # self.pgs = Views(self.page) 
+        # self.adm_Pgs = views_Adm(self.page)
+        # self.aluno_pgs = views_aluno(self.page)
+        # self.prof_pgs = views_Professor(self.page)
+        self.Sidebar_normal = Sidebar(self.page)
+        self.sideAdmin = sidebarAdmin(self.page)
+        self.sideAluno = sidebarAluno(self.page)
+        self.sideProf = sidebarProf(self.page)
         #Dicionario de endereços(Routes: View atrelada)
+
         # self.routes = { 
         #     "/": Views(self.page).LoginView(),
         #     "/home": self.pgs.HomeView(),
@@ -24,15 +30,14 @@ class Router:
         # }
 
     def route_change(self):
-        self.page.views.clear()
         #Puxar do dicionário a pagina atrelada ao Route indicado e coloca-la nas views
         #self.page.views.append(self.routes.get(self.page.route))
         match self.page.route:
-            case "/": self.page.views.append(self.pgs.LoginView())
-            case "/admin/home": self.page.views.append(self.adm_Pgs.HomeView())
-            case "/admin/professores": self.page.views.append(self.adm_Pgs.tabProfessores_View())
-            case "/aluno/home": self.page.views.append(self.aluno_pgs.HomeView())
-            case "/prof/home": self.page.views.append(self.prof_pgs.HomeView())
+            case "/": self.page.views.append(Views(self.page, self.Sidebar_normal).LoginView())
+            case "/admin/home": self.page.views.append(views_Adm(self.page, self.sideAdmin).HomeView())
+            case "/admin/professores": self.page.views.append(views_Adm(self.page, self.sideAdmin).tabProfessores_View())
+            case "/aluno/home": self.page.views.append(views_aluno(self.page, self.sideAluno).HomeView())
+            case "/prof/home": self.page.views.append(views_Professor(self.page, self.sideProf).HomeView())
         self.page.update()
         
 # TESTANDO

@@ -49,16 +49,6 @@ class Sidebar():
         teste = self.rail.destinations[self.rail.selected_index].label
         self.page.go(teste)
         
-    def rtnSide(self):
-        ctn = ft.Container(
-            content=self.rail,offset=(0,0),
-            animate_offset=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
-            animate_opacity=ft.Animation(400, ft.AnimationCurve.EASE_IN_OUT_BACK),
-            animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
-            width=120
-        )
-        return ctn #Retorna a NavRail
-    
     
     
 #Construção das sidebar_filhas
@@ -100,8 +90,6 @@ class sidebarProf(Sidebar):
         for destino in destinations:
             self.rail.destinations.append(destino)
         
-    def rtnSide(self):
-        return super().rtnSide()
 
 class sidebarAluno(Sidebar):
     def __init__(self, page):
@@ -137,8 +125,6 @@ class sidebarAluno(Sidebar):
         for destino in destinations:
             self.rail.destinations.append(destino)
             
-    def rtnSide(self):
-        return super().rtnSide()
     
 class sidebarAdmin(Sidebar):
     def __init__(self, page):
@@ -165,6 +151,4 @@ class sidebarAdmin(Sidebar):
             self.rail.destinations.append(testes)
         self.nrdHome.nav.label = "/admin/home"
     
-    def rtnSide(self):
-        return super().rtnSide()
     

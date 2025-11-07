@@ -10,11 +10,11 @@ from .customControls import *
 
 class Views:
     
-    def __init__(self, page: ft.Page):
+    def __init__(self, page: ft.Page, sidebar: Sidebar):
         self.page = page
         self.content: ft.View #Páginas retornadas
         self.body: ft.Row #Corpo das views
-        self.sidebar: Sidebar = Sidebar(self.page) #Sidebar que será retornada
+        self.sidebar: Sidebar = sidebar #Sidebar que será retornada 
         
         #botão de colapsar a sidebar 
         def toggle_sidebar(e): #função pro click
@@ -44,6 +44,7 @@ class Views:
             self.page.views.pop() #Remove pag atual
             try:
                 topView: View = self.page.views[-1]
+                self.page.views.clear()
                 self.page.go(topView.route) #Pega a rota da anterior e vai
             except:
                 self.page.go("/")
@@ -112,8 +113,7 @@ class Views:
     
     #Página Home (Testes)
     def HomeView(self):
-        self.homeMeio.controls = None
-
+        self.homeMeio.controls.clear()
         self.content = ft.View(
             #route="/home", Inserir separada nas filhas
                     controls=[
@@ -164,6 +164,7 @@ class Views:
             ],expand=True
 
         )
+        self.sidebar.rail.selected_index = 0
         self.body.controls.insert(0, self.sidebar.ctn) #Adiciona sidebar primeiro
         self.content.controls.append(self.body) #add corpo a view    
     #Páginas de mostrar Tabelas
@@ -176,8 +177,8 @@ class Views:
 
 class views_Adm(Views):
 
-    def __init__(self, page):
-        super().__init__(page)
+    def __init__(self, page, sidebar):
+        super().__init__(page, sidebar)
         #Adiciona a sidebar específica
         self.sidebar =sidebarAdmin(self.page) #Recebe o navRail de Adm
         
@@ -198,6 +199,9 @@ class views_Adm(Views):
             else:
                 ctnCadastro.content.visible = not ctnCadastro.content.visible
                 listTurmas = select_DB("Turma","idTurma,nome")
+                ctnCadastro.maior_idProfessor = select_Maior("professor","idprofessor")
+                ctnCadastro.maior_idAdmin = select_Maior("admin","idadmin")
+                ctnCadastro.maior_idAluno = select_Maior("aluno","idaluno")
                 ctnCadastro.drpTurmas.options = None
                 for id, turma in listTurmas: #For com Index
                     ctnCadastro.drpTurmas.options.append(
@@ -239,20 +243,18 @@ class views_Adm(Views):
         return self.content
     
     def tabProfessores_View(self):
-        colunas= ["RP", "Nome", "Email", "Materias"]
-        linhas = "idProfessor, nome, email"
-        nsei = Tab_profs("Professor", colunas, linhas)
-        self.Tabela = nsei.Tab
+        tbProf = Tab_profs("Professor", ["RP", "Nome", "Email", "Materias"], "idProfessor, nome, email")
+        self.Tabela = tbProf.Tab
         
         #chama a construção padrão
         super().TableView()
-        
+        self.sidebar.rail.selected_index = 2
         self.content.route ="/admin/professores"
         return self.content
 
 class views_aluno(Views):
-    def __init__(self, page):
-        super().__init__(page)
+    def __init__(self, page, sidebar):
+        super().__init__(page, sidebar)
         self.sidebar = sidebarAluno(self.page) #Recebe o navRail de Aluno
 
     def HomeView(self):
@@ -264,8 +266,8 @@ class views_aluno(Views):
     
 class views_Professor(Views):
 
-    def __init__(self, page):
-        super().__init__(page)
+    def __init__(self, page, sidebar):
+        super().__init__(page, sidebar)
         self.sidebar = sidebarProf(self.page)
 
     def HomeView(self):

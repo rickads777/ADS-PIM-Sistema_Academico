@@ -53,9 +53,14 @@ def homeCard(icone: ft.Icons, nome, page: ft.Page = None, rota = "", sidebar: ft
 class caixaCadastros():
     def __init__(self, page :ft.Page):    
         self.page = page
+        # Maiores IDs de cada
+        self.maior_idAluno = 0
+        self.maior_idProfessor= 0
+        self.maior_idAdmin = 0
+
         # TextFields
         self.fldNome = ft.TextField(label="Nome",)
-        self.fldUsuario = ft.TextField(label="Usuário")
+        self.fldUsuario = ft.TextField(label="Usuário", disabled=True)
         self.fldSenha = ft.TextField(label="Senha",)
         self.fldEmail = ft.TextField(label="E-mail",)
         self.fields = [self.fldNome,self.fldUsuario, self.fldSenha, self.fldEmail]
@@ -66,7 +71,6 @@ class caixaCadastros():
             field.focused_bgcolor = ft.Colors.LIGHT_BLUE_700
             field.color = ft.Colors.WHITE
             field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
-
         # Dropdown p/ selecionar usuarios
         ## Opções
         Usuarios = ["Admin","Aluno","Professor"]    
@@ -153,10 +157,23 @@ class caixaCadastros():
         self.drpUsuario.value = ""
         self.drpUsuario.border_color = ft.Colors.WHITE
         self.drpTurmas.border_color = ft.Colors.WHITE
+        check: ft.Checkbox
+        for check in self.alertMaterias.alertBody.controls:
+            check.value = False
         self.page.update()
     ## Salvar
     def Salvar(self,e):
-        verficacao = False #Controle de se existe algo nulo
+        verficacao = False #Controle de se existe algo nulo, se existe é True
+        if self.drpUsuario.value == "Aluno" and self.drpTurmas.value == None:
+            verficacao = True
+            self.drpTurmas.border_color = ft.Colors.RED
+        elif self.drpUsuario.value == "Professor":
+            check: ft.Checkbox
+            for check in self.alertMaterias.alertBody.controls:
+                if check.value:
+                    break
+                else:
+                    verficacao = True
         for field in self.fields:
             if field.value == '':
                 field.border_color = ft.Colors.RED
@@ -164,9 +181,6 @@ class caixaCadastros():
         if self.drpUsuario.value == '' or None:
             verficacao = True
             self.drpUsuario.border_color = ft.Colors.RED
-        if self.drpUsuario.value == "Aluno" and self.drpTurmas.value == None:
-            verficacao = True
-            self.drpTurmas.border_color = ft.Colors.RED
         if verficacao:
             self.page.update()
             return
@@ -180,14 +194,19 @@ class caixaCadastros():
             self.content.height =355
             self.drpTurmas.visible = True
             self.btnSlct_Materia.visible = False
+            self.fldUsuario.value = "A"+(str(self.maior_idAluno + 1))
         elif self.drpUsuario.value == "Professor":
             self.content.height =345
             self.btnSlct_Materia.visible = True
             self.drpTurmas.visible = False
+            self.fldUsuario.value = "P"+(str(self.maior_idProfessor + 1))
+        elif self.drpUsuario.value == "Admin":
+            self.fldUsuario.value = "R"+(str(self.maior_idProfessor + 1))
         else:
             self.content.height =300
             self.drpTurmas.visible = False
             self.btnSlct_Materia.visible = False
+            self.fldUsuario.value = None
             
         
         self.page.update()
@@ -229,6 +248,7 @@ class popEsc_Materia:
 
     def salvarEscolha_Materias(self, e):
         check:ft.Checkbox
+        self.Materias_Escolhidas.clear()
         for check in self.alertBody.controls:
             if check.value:
                 self.Materias_Escolhidas.append(self.dbMaterias.get(check.label))
