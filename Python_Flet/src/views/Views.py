@@ -41,8 +41,8 @@ class Views:
 
     #funcoes para os btns
     def view_pop(self, e: ViewPopEvent): #Voltar a páginas/ Testar melhor quando tiver mais
-            self.page.views.pop() #Remove pag atual
             try:
+                self.page.views.pop() #Remove pag atual
                 topView: View = self.page.views[-1]
                 self.page.views.clear()
                 self.page.go(topView.route) #Pega a rota da anterior e vai
