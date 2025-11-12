@@ -1,0 +1,5 @@
+.vscode/
+Python_Flet/.venv/
+Python_Flet/__pycache__/
+Python_Flet/src/__pycache__/
+Python_Flet/src/views/__pycache__/
