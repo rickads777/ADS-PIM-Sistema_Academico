@@ -56,7 +56,7 @@ class Views:
 
         #campos e variáveis
         field_Usuario = ft.TextField(hint_text="Usuário", prefix_icon=ft.Icons.PERSON, autofocus=True)
-        field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK)
+        field_Senha = ft.TextField(hint_text="Senha",prefix_icon=ft.Icons.LOCK, password=True)
 
         
         #Validar Login
@@ -202,8 +202,8 @@ class views_Adm(Views):
                 ctnCadastro.maior_idProfessor = select_Maior("professor","idprofessor")
                 ctnCadastro.maior_idAdmin = select_Maior("admin","idadmin")
                 ctnCadastro.maior_idAluno = select_Maior("aluno","idaluno")
-                ctnCadastro.drpTurmas.options = None
-                for id, turma in listTurmas: #For com Index
+                ctnCadastro.drpTurmas.options = []
+                for id, turma in listTurmas: 
                     ctnCadastro.drpTurmas.options.append(
                         ft.DropdownOption(
                             key=id,
@@ -243,7 +243,7 @@ class views_Adm(Views):
         return self.content
     
     def tabProfessores_View(self):
-        tbProf = Tab_profs("Professor", ["RP", "Nome", "Email", "Materias"], "idProfessor, nome, email")
+        tbProf = Tab_profs(self.page,"Professor", ["RP", "Nome", "Email", "Materias"], "idprofessor,usuario, nome, email")
         self.Tabela = tbProf.Tab
         
         #chama a construção padrão

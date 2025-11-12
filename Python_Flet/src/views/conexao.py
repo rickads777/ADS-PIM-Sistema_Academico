@@ -35,3 +35,7 @@ def select_Maior(table, coluna):
 def select_Senha(table, senha):
     cursor.execute(f'SELECT senha FROM {table} where senha = "{senha}"')
     return str(cursor.fetchall()).strip("[](\'),")
+
+def select_Senha_User(table, senha):
+    cursor.execute(f'SELECT senha FROM {table} where usuario = "{senha}"')
+    return str(cursor.fetchall()).strip("[](\'),")

@@ -162,6 +162,7 @@ class caixaCadastros():
         for check in self.alertMaterias.alertBody.controls:
             check.value = False
         self.page.update()
+    
     ## Salvar
     def Salvar(self,e):
         verficacao = False #Controle de se existe algo nulo, se existe é True
@@ -207,6 +208,9 @@ class caixaCadastros():
             self.fldUsuario.value = "P"+(str(self.maior_idProfessor + 1))
         elif self.drpUsuario.value == "Admin":
             self.fldUsuario.value = "R"+(str(self.maior_idProfessor + 1))
+            self.content.height =300
+            self.drpTurmas.visible = False
+            self.btnSlct_Materia.visible = False
         else:
             self.content.height =300
             self.drpTurmas.visible = False
@@ -259,8 +263,7 @@ class popEsc_Materia:
         self.page.close(self.popEsc_Mat)
 
 #Sidebar Controls
-
-#navRailDestination
+##navRailDestination
 class sideDestination:
     def __init__(self, icone: ft.Icons, rota, texto):    
         
@@ -279,7 +282,8 @@ class sideDestination:
 
 #Tabela Genérica, padrão para as subclasses
 class Tabela():
-    def __init__(self, nomeTabela: str, colunas: list, linhas: str ):
+    def __init__(self, page: ft.Page, nomeTabela: str, colunas: list, linhas: str ):
+        self.page = page
         self.nomeTabela = nomeTabela
         self.colunas = colunas
         self.colunas.append("") #Adiciona coluna sem nada, pra ficar os botões
@@ -291,13 +295,17 @@ class Tabela():
                     ft.Text(coluna)
                 )
             )
+    def editarLinha(self):
         
+        pass
+    def excluirLinha(self):
+        pass
+
     
 
 class Tab_profs(Tabela):
-    def __init__(self, nomeTabela, colunas, linhas):
-        super().__init__(nomeTabela, colunas, linhas)
-        self.btnEditar = ft.IconButton(icon=ft.Icons.EDIT)
+    def __init__(self, page, nomeTabela, colunas, linhas):
+        super().__init__(page,nomeTabela, colunas, linhas)
         self.btnExcluir = ft.IconButton(icon=ft.Icons.DELETE)
         self.criarLinhas()
 
@@ -305,18 +313,179 @@ class Tab_profs(Tabela):
         #Seleciona as linhas da tabela
         linhas_dtTble = select_DB(self.nomeTabela,self.linhas)
 
-        for id,nome,email in linhas_dtTble:
+        for id, usuario, nome, email in linhas_dtTble:
             materias = generic_Select_DB(f"select m.nome from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where p.idprofessor = {id}")
             mat_prof = ", ".join(f'{materia}'.strip("()\',") for materia in materias)
             
             self.Tab.rows.append(
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(ft.Text(id)),
-                        ft.DataCell(ft.Text(nome)),
-                        ft.DataCell(ft.Text(email)),
-                        ft.DataCell(ft.Text(mat_prof)),
-                        ft.DataCell(ft.Row([self.btnEditar, self.btnExcluir]))
-                    ]
-                )
+                # ft.DataRow(
+                #     cells=[
+                #         ft.DataCell(ft.Text(usuario)),
+                #         ft.DataCell(ft.Text(nome)),
+                #         ft.DataCell(ft.Text(email)),
+                #         ft.DataCell(ft.Text(mat_prof)),
+                #         ft.DataCell(ft.Row([
+                #             ft.IconButton(icon=ft.Icons.EDIT), 
+                #             self.btnExcluir
+                #             ]))
+                #     ]
+                # )
+                dtLinha_Prof(self.page, nome, usuario,"teste", email, mat_prof).linha
             )
+
+class dtLinha:
+    def __init__(self, page: ft.Page, nome, usuario, senha, email):
+        #Paramêtros com valores recebidos
+        self.page = page
+        self.nome = nome
+        self.usuario = usuario
+        self.senha = senha
+        self.email = email
+        self.linha: ft.DataRow
+        
+        #Textos fixos
+        self.txtNome = ft.Text(self.nome)
+        self.txtUsuario = ft.Text(self.usuario)
+        self.txtSenha = ft.Text(value="*****")
+        self.txtEmail = ft.Text(self.email)
+
+        self.texts = [self.txtNome, self.txtUsuario, self.txtSenha, self.txtEmail]
+
+        #Text fields
+        self.fldNome = ft.TextField(value=self.nome)
+        self.fldSenha = ft.TextField(value=self.senha)
+        self.fldEmail = ft.TextField(value=self.email)
+
+        self.fields = [self.fldNome, self.fldSenha, self.fldEmail]
+        for field in self.fields:
+            field.visible = False
+            field.expand = True
+            field.text_size = 15
+        
+        #Botões
+        self.btnEditar = ft.IconButton(
+            icon=ft.Icons.EDIT,
+        )
+        self.btnExcluir = ft.IconButton(
+            icon=ft.Icons.DELETE,
+            
+        )
+        self.btnConfirmar = ft.IconButton(
+            icon=ft.Icons.CHECK_CIRCLE, 
+            icon_color=ft.Colors.LIGHT_BLUE,
+            visible= False,
+            #on_click= self.Salvar
+        )
+        self.btnCancelar = ft.IconButton(
+            icon=ft.Icons.CANCEL,
+            icon_color=ft.Colors.LIGHT_BLUE,
+            visible= False,
+            
+        )
+
+        #Senha Row
+        self.rowSenha = ft.Row(
+                            [
+                                ft.IconButton(
+                                    icon=ft.Icons.VISIBILITY_OFF,
+                                    selected_icon= ft.Icons.VISIBILITY,
+                                    selected=False
+                                ),
+                                self.txtSenha,
+                                self.fldSenha
+                            ]
+                        )
+    def troca_Visible(self):
+        self.btnEditar.visible = not self.btnEditar.visible
+        self.btnExcluir.visible = not self.btnExcluir.visible
+        self.btnConfirmar.visible = not self.btnConfirmar.visible 
+        self.btnCancelar.visible = not self.btnCancelar.visible 
+        for field in self.fields:
+            field.visible = not field.visible
+        for text in self.texts:
+            if text == self.txtUsuario:
+                continue
+            text.visible = not text.visible
+            
+
+    
+
+class dtLinha_Prof(dtLinha):
+    def __init__(self, page, nome, usuario, senha, email, materias):
+        super().__init__(page, nome, usuario, senha, email)
+        self.materias = materias
+        #Field
+        self.txtMaterias = ft.Text(value=self.materias)
+        self.texts.append(self.txtMaterias)
+
+        self.btnCancelar.on_click= self.click_Cancelar
+        self.btnEditar.on_click= self.click_Editar
+        
+        self.alertMaterias = popEsc_Materia(self.page) #Chama a Classe do PopUp
+        self.btnSlct_Materia = ft.TextButton(
+            text="Selecionar Materias",
+            visible=False,
+            #width=310,
+            on_click=self.alertMaterias.abrirPop_Escolher_Materias
+        )
+
+        self.linha= ft.DataRow(
+            cells=[
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtUsuario,
+                                ],
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtNome,
+                                    self.fldNome
+                                ]
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtEmail,
+                                    self.fldEmail
+                                ]
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtMaterias,
+                                    self.btnSlct_Materia
+                                ]
+                            )
+                        ),
+                        # ft.DataCell(
+                        #     content=ft.Container(
+                        #         [
+                        #             self.rowSenha
+                        #         ]
+                        #     )
+                        # ),
+                        
+                        ft.DataCell(ft.Row([
+                            self.btnEditar, 
+                            self.btnExcluir,
+                            self.btnConfirmar,
+                            self.btnCancelar
+                            ]))
+                    ]
+        )
+    def troca_Visible(self):
+        self.btnSlct_Materia.visible = not self.btnSlct_Materia.visible
+        return super().troca_Visible()
+        
+    def click_Editar(self, e):
+        self.troca_Visible()
+        self.page.update()
+
+    def click_Cancelar(self, e):
+        self.troca_Visible()
+        self.page.update()
