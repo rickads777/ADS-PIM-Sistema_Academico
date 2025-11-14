@@ -414,6 +414,38 @@ class dtLinha:
                                 self.fldSenha
                             ]
                         )
+        
+        #Linha Padrão
+        self.linha = ft.DataRow(
+            cells=[
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtUsuario,
+                                ],
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtNome,
+                                    self.fldNome
+                                ]
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Row(
+                                [
+                                    self.txtEmail,
+                                    self.fldEmail
+                                ]
+                            )
+                        ),
+                        ft.DataCell(
+                            content= self.rowSenha
+
+                        )])
+
     def troca_Visible(self):
         self.btnEditar.visible = not self.btnEditar.visible
         self.btnExcluir.visible = not self.btnExcluir.visible
@@ -477,51 +509,23 @@ class dtLinha_Prof(dtLinha):
             on_click=self.alertMaterias.abrirPop_Escolher_Materias
         )
 
-        self.linha= ft.DataRow(
-            cells=[
-                        ft.DataCell(
-                            content=ft.Row(
-                                [
-                                    self.txtUsuario,
-                                ],
-                            )
-                        ),
-                        ft.DataCell(
-                            content=ft.Row(
-                                [
-                                    self.txtNome,
-                                    self.fldNome
-                                ]
-                            )
-                        ),
-                        ft.DataCell(
-                            content=ft.Row(
-                                [
-                                    self.txtEmail,
-                                    self.fldEmail
-                                ]
-                            )
-                        ),
-                        ft.DataCell(
-                            content= self.rowSenha
-
-                        ),
-                        ft.DataCell(
-                            content=ft.Column(
-                                [
-                                    self.txtMaterias,
-                                    self.btnSlct_Materia
-                                ], scroll= ft.ScrollMode.AUTO
-                            )
-                        ),
-                        
-                        ft.DataCell(ft.Row([
-                            self.btnEditar, 
-                            self.btnExcluir,
-                            self.btnConfirmar,
-                            self.btnCancelar
-                            ]))
-                    ]
+        self.linha.cells.append(
+            ft.DataCell(
+                content=ft.Column(
+                    [
+                        self.txtMaterias,
+                        self.btnSlct_Materia
+                    ], scroll= ft.ScrollMode.AUTO
+                )
+            ))               
+        self.linha.cells.append(ft.DataCell(
+            ft.Row([
+                self.btnEditar, 
+                self.btnExcluir,
+                self.btnConfirmar,
+                self.btnCancelar
+                ])
+            )
         )
     def troca_Visible(self):
         self.btnSlct_Materia.visible = not self.btnSlct_Materia.visible

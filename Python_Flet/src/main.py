@@ -23,7 +23,7 @@ def main(page: ft.Page):
             topView: View = page.views[-1] 
             page.go(topView.route) #Pega a rota da anterior e vai
         except:
-            page.go(e.view.route)
+            page.go("/")
     
     #adicionar página no app
     page.on_route_change = route_change #definir comportamente quando route for mudado
