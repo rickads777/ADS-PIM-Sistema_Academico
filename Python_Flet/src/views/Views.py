@@ -199,9 +199,9 @@ class views_Adm(Views):
             else:
                 ctnCadastro.content.visible = not ctnCadastro.content.visible
                 listTurmas = select_DB("Turma","idTurma,nome")
-                ctnCadastro.maior_idProfessor = select_Maior("professor","idprofessor")
-                ctnCadastro.maior_idAdmin = select_Maior("admin","idadmin")
-                ctnCadastro.maior_idAluno = select_Maior("aluno","idaluno")
+                ctnCadastro.maior_idProfessor = select_Next_Increment("professor")
+                ctnCadastro.maior_idAdmin = select_Next_Increment("admin")
+                ctnCadastro.maior_idAluno = select_Next_Increment("aluno")
                 ctnCadastro.drpTurmas.options = []
                 for id, turma in listTurmas: 
                     ctnCadastro.drpTurmas.options.append(

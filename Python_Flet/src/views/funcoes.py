@@ -51,7 +51,7 @@ def cadastrar_Usuario(tipo: str, nome, usuario, senha, email, idturma = None, ls
     elif lstMaterias != None: # Professor sendo cadastrado
         generic_Comitable(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
         for materia in lstMaterias:
-            generic_Comitable(f'INSERT INTO Professor_Materia (idprofessor, idmateria) VALUES ({idProfessor+1}, {materia})')
+            generic_Comitable(f'INSERT INTO Professor_Materia (idprofessor, idmateria) VALUES ({idProfessor}, {materia})')
 
     else:
         generic_Comitable(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')

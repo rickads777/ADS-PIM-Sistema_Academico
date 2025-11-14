@@ -189,9 +189,9 @@ class caixaCadastros():
             return
         else:
             cadastrar_Usuario(self.drpUsuario.value, self.fldNome.value, self.fldUsuario.value, self.fldSenha.value, self.fldEmail.value, self.drpTurmas.value, self.alertMaterias.Materias_Escolhidas, self.maior_idProfessor)
-            self.maior_idProfessor = select_Maior("professor","idprofessor")
-            self.maior_idAdmin = select_Maior("admin","idadmin")
-            self.maior_idAluno = select_Maior("aluno","idaluno")
+            self.maior_idProfessor = select_Next_Increment("professor")
+            self.maior_idAdmin = select_Next_Increment("admin")
+            self.maior_idAluno = select_Next_Increment("aluno")
             self.Limpar(e)
     # Função on_change
     ## Mostrar Turmas
@@ -200,14 +200,14 @@ class caixaCadastros():
             self.content.height =355
             self.drpTurmas.visible = True
             self.btnSlct_Materia.visible = False
-            self.fldUsuario.value = "A"+(str(self.maior_idAluno + 1))
+            self.fldUsuario.value = "A"+(str(self.maior_idAluno))
         elif self.drpUsuario.value == "Professor":
             self.content.height =345
             self.btnSlct_Materia.visible = True
             self.drpTurmas.visible = False
-            self.fldUsuario.value = "P"+(str(self.maior_idProfessor + 1))
+            self.fldUsuario.value = "P"+(str(self.maior_idProfessor))
         elif self.drpUsuario.value == "Admin":
-            self.fldUsuario.value = "R"+(str(self.maior_idProfessor + 1))
+            self.fldUsuario.value = "R"+(str(self.maior_idAdmin))
             self.content.height =300
             self.drpTurmas.visible = False
             self.btnSlct_Materia.visible = False
@@ -264,6 +264,23 @@ class popEsc_Materia:
                 self.Materias_Escolhidas.append(self.dbMaterias.get(check.label))
         self.page.close(self.popEsc_Mat)
 
+##Pop Up Exlcuir
+class popExcluir_Cadastro:
+    def __init__(self, usuario):
+        self.usuario = usuario
+        self.btnConfirma = ft.TextButton("Confirmar")
+        self.btnCancela = ft.TextButton("Cancelar")
+        self.popExcluir = ft.AlertDialog(
+        title=ft.Text(f"Excluindo - {self.usuario}"),
+        actions=[
+            self.btnConfirma,
+            self.btnCancela
+        ],
+        actions_alignment=ft.MainAxisAlignment.END,
+        content= ft.Text("Você realmente deseja realizar a exclusão? Essa alteração é final"),
+        modal=True
+    )
+
 #Sidebar Controls
 ##navRailDestination
 class sideDestination:
@@ -299,7 +316,6 @@ class Tabela():
                 )
             )
     def editarLinha(self):
-        
         pass
     def excluirLinha(self):
         pass
@@ -328,13 +344,15 @@ class Tab_profs(Tabela):
             )
 
 class dtLinha:
-    def __init__(self, page: ft.Page, nome, usuario, senha, email):
+    def __init__(self, page: ft.Page, nome, usuario: str, senha, email):
         #Paramêtros com valores recebidos
         self.page = page
         self.nome = nome
         self.usuario = usuario
         self._senha = senha
         self.email = email
+        self.id = int(usuario.strip("APR"))
+        self.identificador = usuario[0]
         self.linha: ft.DataRow
         
         #Textos fixos
@@ -350,6 +368,10 @@ class dtLinha:
         self.fldSenha = ft.TextField(value=self._senha)
         self.fldEmail = ft.TextField(value=self.email)
 
+        #alerta de exclusão
+        self.alert_Excluir = popExcluir_Cadastro(self.usuario)
+        self.alert_Excluir.btnConfirma.on_click = self.click_Excluir
+
         self.fields = [self.fldNome, self.fldSenha, self.fldEmail]
         for field in self.fields:
             field.visible = False
@@ -362,6 +384,7 @@ class dtLinha:
         )
         self.btnExcluir = ft.IconButton(
             icon=ft.Icons.DELETE,
+            on_click=lambda e: self.page.open(self.alert_Excluir.popExcluir)
             
         )
         self.btnConfirmar = ft.IconButton(
@@ -408,7 +431,21 @@ class dtLinha:
         self.btnMostra_Senha.selected = not self.btnMostra_Senha.selected 
         self.txtSenha.value = "*****" if self.txtSenha.value == self._senha else self._senha
         self.page.update()
-
+    
+    def click_Excluir(self,e):
+        match self.identificador:
+            case "R":
+                delete_Registo("admin",self.id, "idadmin")
+            case "A":
+                delete_Registo("aluno", self.id, "idaluno")
+            case "P":
+                delete_Registo("professor_materia", self.id, "idprofessor")
+                delete_Registo("professor", self.id, "idprofessor")
+                self.page.close(self.alert_Excluir.popExcluir)
+                self.page.update()
+                self.page.go("/admin/home")
+                self.page.go("/admin/professores")
+                self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} excluído com sucesso")))
 
             
 
@@ -419,7 +456,7 @@ class dtLinha_Prof(dtLinha):
         super().__init__(page, nome, usuario, senha, email)
         self.materias = ", ".join(f'{materia}' for materia in materias) #Materias como Str
         self.listMaterias = materias #Lista das mastérias
-        self.id = int(usuario.replace("P",""))
+        
         
         #Field
         self.txtMaterias = ft.Text(value=self.materias, width=180)
