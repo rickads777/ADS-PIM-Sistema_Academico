@@ -141,7 +141,7 @@ class sidebarAdmin(Sidebar):
             ).nav,
             sideDestination(
                 Icons.GROUPS,
-                "admin/alunos",
+                "/admin/alunos",
                 "Alunos"
             ).nav,
 

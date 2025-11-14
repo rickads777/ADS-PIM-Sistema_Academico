@@ -315,17 +315,12 @@ class Tabela():
                     heading_row_alignment=ft.MainAxisAlignment.CENTER
                 )
             )
-    def editarLinha(self):
-        pass
-    def excluirLinha(self):
-        pass
 
     
-
+## Tabela Professores
 class Tab_profs(Tabela):
     def __init__(self, page, nomeTabela, colunas, linhas):
         super().__init__(page,nomeTabela, colunas, linhas)
-        self.btnExcluir = ft.IconButton(icon=ft.Icons.DELETE)
         self.criarLinhas()
 
     def criarLinhas(self):
@@ -343,6 +338,23 @@ class Tab_profs(Tabela):
                 dtLinha_Prof(self.page, nome, usuario, senha, email, mat_prof).linha
             )
 
+## Tabela Alunos
+class Tab_alunos(Tabela):
+    def __init__(self, page, nomeTabela, colunas, linhas):
+        super().__init__(page, nomeTabela, colunas, linhas)
+        self.criarLinhas()
+
+    def criarLinhas(self):
+        #Seleciona as linhas da tabela
+        linhas_dtTble = select_DB(self.nomeTabela,self.linhas)
+
+        for usuario, nome, senha, email, idTurma in linhas_dtTble:
+            
+            self.Tab.rows.append(
+                dtLinha_Aluno(self.page, nome, usuario, senha, email).linha
+            )
+
+#linhas das DataTable
 class dtLinha:
     def __init__(self, page: ft.Page, nome, usuario: str, senha, email):
         #Paramêtros com valores recebidos
@@ -353,7 +365,6 @@ class dtLinha:
         self.email = email
         self.id = int(usuario.strip("APR"))
         self.identificador = usuario[0]
-        self.linha: ft.DataRow
         
         #Textos fixos
         self.txtNome = ft.Text(self.nome)
@@ -371,6 +382,7 @@ class dtLinha:
         #alerta de exclusão
         self.alert_Excluir = popExcluir_Cadastro(self.usuario)
         self.alert_Excluir.btnConfirma.on_click = self.click_Excluir
+        self.alert_Excluir.btnCancela.on_click = lambda e: self.page.close(self.alert_Excluir.popExcluir)
 
         self.fields = [self.fldNome, self.fldSenha, self.fldEmail]
         for field in self.fields:
@@ -381,6 +393,7 @@ class dtLinha:
         #Botões
         self.btnEditar = ft.IconButton(
             icon=ft.Icons.EDIT,
+            on_click= self.click_Editar
         )
         self.btnExcluir = ft.IconButton(
             icon=ft.Icons.DELETE,
@@ -397,6 +410,7 @@ class dtLinha:
             icon=ft.Icons.CANCEL,
             icon_color=ft.Colors.LIGHT_BLUE,
             visible= False,
+            on_click= self.click_Cancelar
             
         )
 
@@ -416,7 +430,7 @@ class dtLinha:
                         )
         
         #Linha Padrão
-        self.linha = ft.DataRow(
+        self.linha :ft.DataRow = ft.DataRow(
             cells=[
                         ft.DataCell(
                             content=ft.Row(
@@ -444,7 +458,8 @@ class dtLinha:
                         ft.DataCell(
                             content= self.rowSenha
 
-                        )])
+                        )]
+        )
 
     def troca_Visible(self):
         self.btnEditar.visible = not self.btnEditar.visible
@@ -478,6 +493,17 @@ class dtLinha:
                 self.page.go("/admin/home")
                 self.page.go("/admin/professores")
                 self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} excluído com sucesso")))
+    
+    def click_Editar(self, e):
+        self.troca_Visible()
+        self.page.update()
+
+    def click_Cancelar(self, e):
+        self.troca_Visible()
+        self.fldNome.value = self.txtNome.value
+        self.fldEmail.value = self.txtEmail.value
+        self.fldSenha.value = self.txtSenha.value
+        self.page.update()
 
             
 
@@ -578,3 +604,42 @@ class dtLinha_Prof(dtLinha):
         for check in self.alertMaterias.alertBody.controls:
             if check.label in self.listMaterias:
                 check.value = True
+
+class  dtLinha_Aluno(dtLinha):
+    def __init__(self, page, nome, usuario, senha, email):
+        super().__init__(page, nome, usuario, senha, email)
+        
+        self.btnConfirmar.on_click = self.click_Confirmar
+
+        self.linha.cells.append(ft.DataCell(
+            ft.Row([
+                self.btnEditar, 
+                self.btnExcluir,
+                self.btnConfirmar,
+                self.btnCancelar
+                ])
+            )
+        )
+    
+    def click_Confirmar(self, e):
+        try:
+            connection.connect()
+            cursor.execute(f'update aluno set nome ="{self.fldNome.value}", email ="{self.fldEmail.value}", senha = "{self.fldSenha.value}" where idaluno = {self.id}')
+            connection.commit()
+            connection.close()
+
+        except: 
+            self.page.open(ft.SnackBar(ft.Text(f"Um Erro inesperado Ocorreu")))
+            self.click_Cancelar(e)
+        else:
+            self.txtNome.value = self.fldNome.value 
+            self.txtEmail.value = self.fldEmail.value
+            self._senha = self.fldSenha.value
+            self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} editado com sucesso")))
+            self.click_Editar(e) 
+    
+    def click_Editar(self, e):
+        return super().click_Editar(e)
+    
+    def click_Cancelar(self, e):
+        return super().click_Cancelar(e)

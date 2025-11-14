@@ -223,7 +223,7 @@ class views_Adm(Views):
         
         #Adicona os cards no home view
         self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores", self.page, "/admin/professores", self.sidebar.rail, 2)) 
-        self.homeMeio.controls.append(homeCard(ft.Icons.GROUP,"Alunos"))
+        self.homeMeio.controls.append(homeCard(ft.Icons.GROUP,"Alunos", self.page, "/admin/alunos", self.sidebar, 3))
         self.homeMeio.controls.append(homeCard(ft.Icons.CLASS_,"Turmas"))
         self.homeFim.controls.append(
             ft.Column(
@@ -250,6 +250,14 @@ class views_Adm(Views):
         super().TableView()
         self.sidebar.rail.selected_index = 2
         self.content.route ="/admin/professores"
+        return self.content
+    
+    def tabAlunos_View(self):
+        tbAluno = Tab_alunos(self.page,"aluno",["RA","Nome", "Email", " Senha"],"usuario,nome,senha,email,idturma")
+        self.Tabela = tbAluno.Tab
+        super().TableView()
+        self.sidebar.rail.selected_index = 3
+        self.content.route ="/admin/alunos"
         return self.content
 
 class views_aluno(Views):
