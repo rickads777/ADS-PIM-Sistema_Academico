@@ -243,7 +243,7 @@ class views_Adm(Views):
         return self.content
     
     def tabProfessores_View(self):
-        tbProf = Tab_profs(self.page,"Professor", ["RP", "Nome", "Email", "Materias"], "idprofessor,usuario, nome, email")
+        tbProf = Tab_profs(self.page,"Professor", ["RP", "Nome", "Email", " Senha", "Materias"], "idprofessor, usuario, nome, senha, email")
         self.Tabela = tbProf.Tab
         
         #chama a construção padrão

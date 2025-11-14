@@ -222,7 +222,9 @@ class caixaCadastros():
     def retornaCtnCadastro(self):
         return self.content
 
-#Pop Up para Prof Escolher materias
+#Pop Ups
+
+##Pop Up para Prof Escolher materias
 class popEsc_Materia:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -292,7 +294,8 @@ class Tabela():
         for coluna in self.colunas:
             self.Tab.columns.append(
                 ft.DataColumn(
-                    ft.Text(coluna)
+                    ft.Text(coluna),
+                    heading_row_alignment=ft.MainAxisAlignment.CENTER
                 )
             )
     def editarLinha(self):
@@ -313,24 +316,15 @@ class Tab_profs(Tabela):
         #Seleciona as linhas da tabela
         linhas_dtTble = select_DB(self.nomeTabela,self.linhas)
 
-        for id, usuario, nome, email in linhas_dtTble:
+        for id, usuario, nome, senha, email in linhas_dtTble:
             materias = generic_Select_DB(f"select m.nome from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where p.idprofessor = {id}")
-            mat_prof = ", ".join(f'{materia}'.strip("()\',") for materia in materias)
+            #mat_prof = ", ".join(f'{materia}'.strip("()\',") for materia in materias)
+            mat_prof = []
+            for materia in materias:
+                mat_prof.append(f'{materia}'.strip("()\',") )
             
             self.Tab.rows.append(
-                # ft.DataRow(
-                #     cells=[
-                #         ft.DataCell(ft.Text(usuario)),
-                #         ft.DataCell(ft.Text(nome)),
-                #         ft.DataCell(ft.Text(email)),
-                #         ft.DataCell(ft.Text(mat_prof)),
-                #         ft.DataCell(ft.Row([
-                #             ft.IconButton(icon=ft.Icons.EDIT), 
-                #             self.btnExcluir
-                #             ]))
-                #     ]
-                # )
-                dtLinha_Prof(self.page, nome, usuario,"teste", email, mat_prof).linha
+                dtLinha_Prof(self.page, nome, usuario, senha, email, mat_prof).linha
             )
 
 class dtLinha:
@@ -339,7 +333,7 @@ class dtLinha:
         self.page = page
         self.nome = nome
         self.usuario = usuario
-        self.senha = senha
+        self._senha = senha
         self.email = email
         self.linha: ft.DataRow
         
@@ -353,7 +347,7 @@ class dtLinha:
 
         #Text fields
         self.fldNome = ft.TextField(value=self.nome)
-        self.fldSenha = ft.TextField(value=self.senha)
+        self.fldSenha = ft.TextField(value=self._senha)
         self.fldEmail = ft.TextField(value=self.email)
 
         self.fields = [self.fldNome, self.fldSenha, self.fldEmail]
@@ -384,13 +378,15 @@ class dtLinha:
         )
 
         #Senha Row
-        self.rowSenha = ft.Row(
-                            [
-                                ft.IconButton(
+        self.btnMostra_Senha = ft.IconButton(
                                     icon=ft.Icons.VISIBILITY_OFF,
                                     selected_icon= ft.Icons.VISIBILITY,
-                                    selected=False
-                                ),
+                                    selected=False,
+                                    on_click=self.mostra_Senha
+                                )
+        self.rowSenha = ft.Row(
+                            [
+                                self.btnMostra_Senha,
                                 self.txtSenha,
                                 self.fldSenha
                             ]
@@ -399,33 +395,48 @@ class dtLinha:
         self.btnEditar.visible = not self.btnEditar.visible
         self.btnExcluir.visible = not self.btnExcluir.visible
         self.btnConfirmar.visible = not self.btnConfirmar.visible 
-        self.btnCancelar.visible = not self.btnCancelar.visible 
+        self.btnCancelar.visible = not self.btnCancelar.visible
+        self.btnMostra_Senha.visible = not self.btnMostra_Senha.visible
         for field in self.fields:
             field.visible = not field.visible
         for text in self.texts:
             if text == self.txtUsuario:
                 continue
             text.visible = not text.visible
+
+    def mostra_Senha(self, e):
+        self.btnMostra_Senha.selected = not self.btnMostra_Senha.selected 
+        self.txtSenha.value = "*****" if self.txtSenha.value == self._senha else self._senha
+        self.page.update()
+
+
             
 
     
 
 class dtLinha_Prof(dtLinha):
-    def __init__(self, page, nome, usuario, senha, email, materias):
+    def __init__(self, page, nome, usuario:str, senha, email, materias: list[str]):
         super().__init__(page, nome, usuario, senha, email)
-        self.materias = materias
+        self.materias = ", ".join(f'{materia}' for materia in materias) #Materias como Str
+        self.listMaterias = materias #Lista das mastérias
+        self.id = int(usuario.replace("P",""))
+        
         #Field
-        self.txtMaterias = ft.Text(value=self.materias)
+        self.txtMaterias = ft.Text(value=self.materias, width=180)
         self.texts.append(self.txtMaterias)
 
         self.btnCancelar.on_click= self.click_Cancelar
         self.btnEditar.on_click= self.click_Editar
+        self.btnConfirmar.on_click = self.click_confirmar
         
-        self.alertMaterias = popEsc_Materia(self.page) #Chama a Classe do PopUp
+        #Chama a Classe do PopUp Escolher Materias 
+        self.alertMaterias = popEsc_Materia(self.page) 
+        self.marca_Materias()
+
         self.btnSlct_Materia = ft.TextButton(
             text="Selecionar Materias",
             visible=False,
-            #width=310,
+            width=180,
             on_click=self.alertMaterias.abrirPop_Escolher_Materias
         )
 
@@ -455,20 +466,17 @@ class dtLinha_Prof(dtLinha):
                             )
                         ),
                         ft.DataCell(
-                            content=ft.Row(
+                            content= self.rowSenha
+
+                        ),
+                        ft.DataCell(
+                            content=ft.Column(
                                 [
                                     self.txtMaterias,
                                     self.btnSlct_Materia
-                                ]
+                                ], scroll= ft.ScrollMode.AUTO
                             )
                         ),
-                        # ft.DataCell(
-                        #     content=ft.Container(
-                        #         [
-                        #             self.rowSenha
-                        #         ]
-                        #     )
-                        # ),
                         
                         ft.DataCell(ft.Row([
                             self.btnEditar, 
@@ -488,4 +496,44 @@ class dtLinha_Prof(dtLinha):
 
     def click_Cancelar(self, e):
         self.troca_Visible()
+        self.fldNome.value = self.txtNome.value
+        self.fldEmail.value = self.txtEmail.value
+        self.fldSenha.value = self.txtSenha.value
+        self.marca_Materias()
         self.page.update()
+
+    def click_confirmar(self, e):
+        try:
+            
+            connection.connect()
+            cursor.execute(f'update professor set nome ="{self.fldNome.value}", email ="{self.fldEmail.value}", senha = "{self.fldSenha.value}" where idprofessor = {self.id}')
+            if self.alertMaterias.Materias_Escolhidas != []:
+                cursor.execute(f'delete from professor_materia where idprofessor = {self.id}')
+                for materia in self.alertMaterias.Materias_Escolhidas:
+                    cursor.execute(f'INSERT INTO Professor_Materia (idprofessor, idmateria) VALUES ({self.id}, {materia})')
+            connection.commit()
+            connection.close()
+
+        except: 
+            self.page.open(ft.SnackBar(ft.Text(f"Um Erro inesperado Ocorreu")))
+            self.click_Cancelar(e)
+        else:
+            self.txtNome.value = self.fldNome.value 
+            self.txtEmail.value = self.fldEmail.value
+            self._senha = self.fldSenha.value
+            self.listMaterias.clear()
+            check: ft.Checkbox
+            for check in self.alertMaterias.alertBody.controls:
+                if check.value:
+                    self.listMaterias.append(check.label)
+            materia = ", ".join(f'{materia}' for materia in self.listMaterias)
+            self.txtMaterias.value = materia
+            self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} editado com sucesso")))
+            self.click_Editar(e) 
+
+    def marca_Materias(self):
+        #Selecionar as matérias que já estão cadastradas
+        check: ft.Checkbox
+        for check in self.alertMaterias.alertBody.controls:
+            if check.label in self.listMaterias:
+                check.value = True

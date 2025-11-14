@@ -8,34 +8,60 @@ connection = mysql.connector.connect(
 )
 cursor = connection.cursor()
 
+connection.close()
+
 #Exemplo Create
 #Select
 
 def select_DB (table, colunas):
+    connection.connect()
     cursor.execute(f'SELECT {colunas} FROM {table}')
-    return cursor.fetchall()
+    ret = cursor.fetchall()
+    connection.close()
+    return ret 
 
 def select_Unicos_DB (table, colunas):
+    connection.connect()
     cursor.execute(f'SELECT DISTINCT {colunas} FROM {table}')
-    return cursor.fetchall()
+    ret = cursor.fetchall()
+    connection.close()
+    return ret
 
 def generic_Select_DB(comando):
+    connection.connect()
     cursor.execute(comando)
-    return cursor.fetchall()
+    ret = cursor.fetchall()
+    connection.close()
+    return ret
+
+def generic_Comitable(comando):
+    connection.connect()
+    cursor.execute(comando)
+    connection.commit()
+    connection.close()
 
 def select_Maior(table, coluna):
+    connection.connect()
     cursor.execute(f'SELECT MAX({coluna}) FROM {table}')
     num = str(cursor.fetchall()[0])
     num = num.strip("(\'),")
     try:
+        connection.close()
         return int(num)
     except:
+        connection.close()
         return 0
 
 def select_Senha(table, senha):
+    connection.connect()
     cursor.execute(f'SELECT senha FROM {table} where senha = "{senha}"')
-    return str(cursor.fetchall()).strip("[](\'),")
+    ret = str(cursor.fetchall()).strip("[](\'),")
+    connection.close()
+    return ret
 
 def select_Senha_User(table, senha):
+    connection.connect()
     cursor.execute(f'SELECT senha FROM {table} where usuario = "{senha}"')
-    return str(cursor.fetchall()).strip("[](\'),")
+    ret = str(cursor.fetchall()).strip("[](\'),")
+    connection.close()
+    return ret

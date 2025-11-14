@@ -47,12 +47,11 @@ def controle_Sidebar(page: ft.Page, sidebar:  ft.Container):
 
 def cadastrar_Usuario(tipo: str, nome, usuario, senha, email, idturma = None, lstMaterias = None, idProfessor = None):
     if idturma != None:
-        cursor.execute(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email, idTurma) VALUES ("{nome}", "{usuario}", "{senha}", "{email}", {int(idturma)})')
+        generic_Comitable(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email, idTurma) VALUES ("{nome}", "{usuario}", "{senha}", "{email}", {int(idturma)})')
     elif lstMaterias != None: # Professor sendo cadastrado
-        cursor.execute(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
+        generic_Comitable(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
         for materia in lstMaterias:
-            cursor.execute(f'INSERT INTO Professor_Materia (idprofessor, idmateria) VALUES ({idProfessor+1}, {materia})')
+            generic_Comitable(f'INSERT INTO Professor_Materia (idprofessor, idmateria) VALUES ({idProfessor+1}, {materia})')
 
     else:
-        cursor.execute(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
-    connection.commit()
+        generic_Comitable(f'INSERT INTO {tipo.lower()} (nome, usuario, senha, email) VALUES ("{nome}", "{usuario}", "{senha}", "{email}")')
