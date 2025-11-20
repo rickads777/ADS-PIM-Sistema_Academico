@@ -44,8 +44,9 @@ class Views:
             try:
                 self.page.views.pop() #Remove pag atual
                 topView: View = self.page.views[-1]
-                self.page.views.clear()
+                #self.page.views.clear()
                 self.page.go(topView.route) #Pega a rota da anterior e vai
+                self.page.views.pop() #Remove a página da qual ele pega a rota(a anterior) para que não tenha duplicatas
             except:
                 self.page.go("/")
 

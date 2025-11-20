@@ -20,14 +20,15 @@ def main(page: ft.Page):
     def view_pop(e: ViewPopEvent): #Voltar a páginas
         try:
             page.views.pop() #Remove pag atual
-            topView: View = page.views[-1] 
+            topView: View = page.views[-1]
+            page.views.clear()
             page.go(topView.route) #Pega a rota da anterior e vai
         except:
             page.go("/")
     
     #adicionar página no app
     page.on_route_change = route_change #definir comportamente quando route for mudado
-    page.on_view_pop = view_pop
+    #page.on_view_pop = view_pop
     page.go(page.route)
     
 ft.app(target=main)

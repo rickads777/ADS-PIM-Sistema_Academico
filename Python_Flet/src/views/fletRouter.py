@@ -32,6 +32,9 @@ class Router:
     def route_change(self):
         #Puxar do dicionário a pagina atrelada ao Route indicado e coloca-la nas views
         #self.page.views.append(self.routes.get(self.page.route))
+        if self.page.route == "/": #Limpar as telas num logout
+            self.page.views.clear()
+
         match self.page.route:
             case "/": self.page.views.append(Views(self.page, self.Sidebar_normal).LoginView())
             case "/admin/home": self.page.views.append(views_Adm(self.page, self.sideAdmin).HomeView())
