@@ -342,6 +342,7 @@ class Tab_profs(Tabela):
 class Tab_alunos(Tabela):
     def __init__(self, page, nomeTabela, colunas, linhas):
         super().__init__(page, nomeTabela, colunas, linhas)
+        self.listTurmas = select_DB("Turma","idTurma,nome")
         self.criarLinhas()
 
     def criarLinhas(self):
@@ -351,7 +352,7 @@ class Tab_alunos(Tabela):
         for usuario, nome, senha, email, idTurma in linhas_dtTble:
             
             self.Tab.rows.append(
-                dtLinha_Aluno(self.page, nome, usuario, senha, email).linha
+                dtLinha_Aluno(self.page, nome, usuario, senha, email, idTurma, self.listTurmas).linha
             )
 
 #linhas das DataTable
@@ -606,11 +607,45 @@ class dtLinha_Prof(dtLinha):
                 check.value = True
 
 class  dtLinha_Aluno(dtLinha):
-    def __init__(self, page, nome, usuario, senha, email):
+    def __init__(self, page, nome, usuario, senha, email, idTurma, listTurmas):
         super().__init__(page, nome, usuario, senha, email)
         
+        #Campo de Turmas
+        self.idTurma = idTurma
+        self.listTurmas = listTurmas
+        self.dicTurmas = dict(self.listTurmas)
+        
+        self.txtTurma = ft.Text(self.dicTurmas.get(idTurma))
+        self.dropTurma = ft.Dropdown(
+            label="Turmas",
+            enable_filter=True,
+            visible=False,
+            width=100,
+            enable_search=True,
+            #border_color= ft.Colors.WHITE,
+            #color=ft.Colors.WHITE
+        )
+        for id, turma in self.listTurmas: 
+                    self.dropTurma.options.append(
+                        ft.DropdownOption(
+                            key=id,
+                            text=turma
+                        )
+                    )
+        self.dropTurma.value = idTurma
+        
+        self.texts.append(self.txtTurma)
+
         self.btnConfirmar.on_click = self.click_Confirmar
 
+        self.linha.cells.append(ft.DataCell(
+                ft.Row([
+                    self.txtTurma, self.dropTurma
+                ], alignment=ft.MainAxisAlignment.CENTER, expand=True)
+            )
+        )
+
+        #botões de Edição
         self.linha.cells.append(ft.DataCell(
             ft.Row([
                 self.btnEditar, 
@@ -624,7 +659,7 @@ class  dtLinha_Aluno(dtLinha):
     def click_Confirmar(self, e):
         try:
             connection.connect()
-            cursor.execute(f'update aluno set nome ="{self.fldNome.value}", email ="{self.fldEmail.value}", senha = "{self.fldSenha.value}" where idaluno = {self.id}')
+            cursor.execute(f'update aluno set nome ="{self.fldNome.value}", email ="{self.fldEmail.value}", senha = "{self.fldSenha.value}", idturma = {int(self.dropTurma.value)} where idaluno = {self.id}')
             connection.commit()
             connection.close()
 
@@ -635,11 +670,15 @@ class  dtLinha_Aluno(dtLinha):
             self.txtNome.value = self.fldNome.value 
             self.txtEmail.value = self.fldEmail.value
             self._senha = self.fldSenha.value
+            self.txtTurma.value = self.dicTurmas.get(int(self.dropTurma.value))
             self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} editado com sucesso")))
             self.click_Editar(e) 
     
     def click_Editar(self, e):
+        self.dropTurma.visible = not self.dropTurma.visible  
         return super().click_Editar(e)
     
     def click_Cancelar(self, e):
+        self.dropTurma.visible = not self.dropTurma.visible
+        self.dropTurma.value = self.idTurma 
         return super().click_Cancelar(e)

@@ -254,7 +254,7 @@ class views_Adm(Views):
         return self.content
     
     def tabAlunos_View(self):
-        tbAluno = Tab_alunos(self.page,"aluno",["RA","Nome", "Email", " Senha"],"usuario,nome,senha,email,idturma")
+        tbAluno = Tab_alunos(self.page,"aluno",["RA","Nome", "Email", " Senha","Turma"],"usuario,nome,senha,email,idturma")
         self.Tabela = tbAluno.Tab
         super().TableView()
         self.sidebar.rail.selected_index = 3
