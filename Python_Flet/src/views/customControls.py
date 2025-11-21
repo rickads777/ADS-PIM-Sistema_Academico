@@ -1,4 +1,5 @@
 import flet as ft
+import math
 from .funcoes import *
 from config import cxCadastro_maxHeight
 
@@ -144,7 +145,7 @@ class caixaCadastros():
             border_radius=5,
             padding=10,
             animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
-            width=320,
+            width=290,
             height=0
         )
 
@@ -221,6 +222,130 @@ class caixaCadastros():
 
     def retornaCtnCadastro(self):
         return self.content
+
+class cxCadastro_Turma:
+    def __init__(self, page: ft.Page):
+        self.page = page
+
+        # Fields
+        self.fldNome = ft.TextField(label="Nome")
+        self.fldAno_Letivo = ft.TextField(label="Ano da Turma")
+        self.fields = [self.fldNome, self.fldAno_Letivo]
+
+        ## Estilização dos Fields
+        for field in self.fields: 
+            field.border_color = ft.Colors.WHITE
+            field.bgcolor = ft.Colors.LIGHT_BLUE_800
+            field.focused_bgcolor = ft.Colors.LIGHT_BLUE_700
+            field.color = ft.Colors.WHITE
+            field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
+        
+        # Drop Preiodo
+        self.drpPeriodo = ft.Dropdown(
+            label="Perído",
+            options=[
+                ft.DropdownOption(key="Matutino"),
+                ft.DropdownOption(key="Verpertino"),
+                ft.DropdownOption(key="Noturno"),
+                ft.DropdownOption(key="Integral"),
+            ],
+            border_color= ft.Colors.WHITE,
+            color=ft.Colors.WHITE
+        )
+        
+        self.cxCadastro = ft.Row([
+                ft.Column([
+                    self.fldNome,
+                    ft.Row([
+                        self.fldAno_Letivo,
+                    ], height=55),
+                    
+                    ft.Row([
+                        self.drpPeriodo,
+                        ft.Row([
+                            ft.IconButton(icon=ft.Icons.CHECK_CIRCLE, icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
+                                        on_click= self.Salvar
+                                        ),
+                            ft.IconButton(icon=ft.Icons.CANCEL,icon_size=30, icon_color=ft.Colors.LIGHT_BLUE,
+                                        on_click= self.Limpar
+                                        )
+                        ], alignment=ft.MainAxisAlignment.CENTER, expand=True
+                        )
+                    ], expand=True
+                    ),
+                    
+                ], expand=True
+                ),
+            ],expand=True
+        )
+
+        self.content :ft.Container = ft.Container(
+            content=self.cxCadastro,
+            bgcolor=ft.Colors.LIGHT_BLUE_900,
+            border_radius=5,
+            padding=10,
+            animate=ft.Animation(500, ft.AnimationCurve.EASE_IN_OUT),
+            width=320,
+            height=0
+        )
+    
+    def Salvar(self,e):
+        verificacao = False # Se Nulo/Erro = True
+        try:
+            ano = int(self.fldAno_Letivo.value)
+        except:
+            self.fldAno_Letivo.error_text = "Ano deve ser um número"
+            self.drpPeriodo.border_color = ft.Colors.RED
+            verificacao = True
+        else:
+            
+            if int(math.log10(ano))+1 != 4:
+                self.fldAno_Letivo.error_text = "Ano deve ter 4 Dígitos"
+                self.drpPeriodo.border_color = ft.Colors.RED
+                verificacao = True
+            elif ano <= 2025:
+                self.fldAno_Letivo.error_text = "Insira um ano válido"
+                self.drpPeriodo.border_color = ft.Colors.RED
+                verificacao = True
+        if self.drpPeriodo.value == None:
+            self.drpPeriodo.border_color = ft.Colors.RED
+            verificacao = True
+        for field in self.fields:
+            if field.value == "":
+                field.border_color = ft.Colors.RED
+                verificacao = True
+        if verificacao:
+            self.page.update()
+            return
+        else:
+            try:
+                generic_Comitable(f'insert into Turma (nome, periodo, anoInicio) values ("{self.fldNome.value}","{self.drpPeriodo.value}", {ano})')
+            except:
+                self.page.open(ft.SnackBar(ft.Text(f"Erro Inesperado")))
+            else:
+                self.page.open(ft.SnackBar(ft.Text(f"Turma {self.fldNome.value} criada com sucesso")))
+                self.LimparErro()
+                self.fldNome.value = ""
+        self.page.update()
+            
+        
+
+    def Limpar(self,e):
+        self.LimparErro()
+        self.fldNome.value = ""
+        self.fldAno_Letivo.value = ""
+        self.drpPeriodo.key = "None"
+        self.drpPeriodo.value = None
+        self.page.update()
+
+    def LimparErro(self):
+        for field in self.fields: 
+            field.border_color = ft.Colors.WHITE
+            field.color = ft.Colors.WHITE
+            field.label_style = ft.TextStyle(color=ft.Colors.WHITE)
+        self.drpPeriodo.label_style = ft.TextStyle(color=ft.Colors.WHITE)
+        self.drpPeriodo.border_color = ft.Colors.WHITE
+        self.fldAno_Letivo.error_text = None
 
 #Pop Ups
 

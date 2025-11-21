@@ -191,7 +191,6 @@ class views_Adm(Views):
         #Função para abrir o cadastro
         def abrirCadastro(e):
             if ctnCadastro.content.visible:
-                #ctnCadastro.width = 0
                 ctnCadastro.content.height = 0
                 self.page.update()
                 ctnCadastro.content.visible = not ctnCadastro.content.visible
@@ -216,11 +215,26 @@ class views_Adm(Views):
                 ctnCadastro.muda_Drop(e)
                 #ctnCadastro.width = 320
                 self.page.update()
-                
+        def abrirCadastro_Turmas(e):
+            if ctnCad_Turma.content.visible:
+                ctnCad_Turma.content.height = 0
+                self.page.update()
+                time.sleep(0.5)
+                ctnCad_Turma.content.visible = not ctnCad_Turma.content.visible
+            else:
+                ctnCad_Turma.content.visible = not ctnCad_Turma.content.visible
+                self.page.update()
+                time.sleep(0.1)
+                ctnCad_Turma.content.height = 190
+            self.page.update()
         
         #Container que será aberto no click do cadastro
         ctnCadastro = caixaCadastros(self.page)
         ctnCadastro.content.visible = False
+
+        #Container de cadastro das turmas
+        ctnCad_Turma = cxCadastro_Turma(self.page)
+        ctnCad_Turma.content.visible = False
         
         #Adicona os cards no home view
         self.homeMeio.controls.append(homeCard(ft.Icons.SCHOOL,"Professores", self.page, "/admin/professores", self.sidebar.rail, 2)) 
@@ -233,10 +247,26 @@ class views_Adm(Views):
                         content=ft.Row([
                         ft.Icon(name=ft.Icons.PERSON_ADD),
                         ft.Text("Cadastrar Usuários"),
-                    ]),
+                    ], alignment=ft.MainAxisAlignment.CENTER 
+                    ),
                     on_click=abrirCadastro),
                     ctnCadastro.content
-                ]
+                ],
+                height=400,
+                width=290
+            )
+        )
+        self.homeFim.controls.append(
+            ft.Column(
+                [
+                    ft.FilledTonalButton(
+                        content=ft.Row([
+                        ft.Icon(name=ft.Icons.PERSON_ADD),
+                        ft.Text("Cadastrar Turma"),
+                    ]),
+                    on_click=abrirCadastro_Turmas),
+                    ctnCad_Turma.content
+                ],height=400,
             )
         )
         self.content.route = "/admin/home"
