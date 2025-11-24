@@ -437,7 +437,7 @@ class Tabela():
             self.Tab.columns.append(
                 ft.DataColumn(
                     ft.Text(coluna),
-                    heading_row_alignment=ft.MainAxisAlignment.CENTER
+                    heading_row_alignment=ft.MainAxisAlignment.CENTER,
                 )
             )
 
@@ -518,7 +518,7 @@ class dtLinha:
 
         #Text fields
         self.fldNome = ft.TextField(value=self.nome)
-        self.fldSenha = ft.TextField(value=self._senha)
+        self.fldSenha = ft.TextField(value=self._senha, width=100)
         self.fldEmail = ft.TextField(value=self.email)
 
         #alerta de exclusão
@@ -527,10 +527,8 @@ class dtLinha:
         self.alert_Excluir.btnCancela.on_click = lambda e: self.page.close(self.alert_Excluir.popExcluir)
 
         self.fields = [self.fldNome, self.fldSenha, self.fldEmail]
-        for field in self.fields:
-            field.visible = False
-            field.expand = True
-            field.text_size = 15
+        
+            
         
         #Botões
         self.btnEditar = ft.IconButton(
@@ -563,46 +561,63 @@ class dtLinha:
                                     selected=False,
                                     on_click=self.mostra_Senha
                                 )
-        self.rowSenha = ft.Row(
+        self.rowSenha = ft.Column(
                             [
-                                self.btnMostra_Senha,
-                                self.txtSenha,
-                                self.fldSenha
-                            ]
+                                ft.Row([
+                                    self.btnMostra_Senha,
+                                    self.txtSenha,
+                                    self.fldSenha
+                                ], width=100)
+                            ], width=100
                         )
         
         #Linha Padrão
-        self.linha :ft.DataRow = ft.DataRow(
-            cells=[
-                        ft.DataCell(
-                            content=ft.Row(
+        self.cells  = [ft.DataCell(
+                            content=ft.Column(
                                 [
                                     self.txtUsuario,
-                                ],
+                                ],width=25
                             )
                         ),
                         ft.DataCell(
-                            content=ft.Row(
+                            content=ft.Column(
                                 [
                                     self.txtNome,
                                     self.fldNome
-                                ]
+                                ],width=150
                             )
                         ),
                         ft.DataCell(
-                            content=ft.Row(
+                            content=ft.Column(
                                 [
                                     self.txtEmail,
                                     self.fldEmail
-                                ]
+                                ], width=150
                             )
                         ),
                         ft.DataCell(
                             content= self.rowSenha
 
                         )]
+        self.ajustaLinhas()
+        self.linha :ft.DataRow = ft.DataRow(
+            cells=self.cells
         )
+        
 
+    def ajustaLinhas(self):
+        cell: ft.DataCell
+        for cell in self.cells:
+            linha: ft.Column = cell.content
+            linha.scroll = ft.ScrollMode.AUTO
+            linha.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+            cell.content = linha
+        for field in self.fields:
+            field.visible = False
+            #field.expand = True
+            field.text_size = 15
+            field.expand
+    
     def troca_Visible(self):
         self.btnEditar.visible = not self.btnEditar.visible
         self.btnExcluir.visible = not self.btnExcluir.visible
@@ -644,7 +659,7 @@ class dtLinha:
         self.troca_Visible()
         self.fldNome.value = self.txtNome.value
         self.fldEmail.value = self.txtEmail.value
-        self.fldSenha.value = self.txtSenha.value
+        self.fldSenha.value = self._senha
         self.page.update()
 
             
@@ -653,14 +668,13 @@ class dtLinha:
 
 class dtLinha_Prof(dtLinha):
     def __init__(self, page, nome, usuario:str, senha, email, materias: list[str]):
-        super().__init__(page, nome, usuario, senha, email)
         self.materias = ", ".join(f'{materia}' for materia in materias) #Materias como Str
         self.listMaterias = materias #Lista das mastérias
         
-        
         #Field
-        self.txtMaterias = ft.Text(value=self.materias, width=180)
-        self.texts.append(self.txtMaterias)
+        self.txtMaterias = ft.Text(value=self.materias)
+        
+        super().__init__(page, nome, usuario, senha, email)
 
         self.btnCancelar.on_click= self.click_Cancelar
         self.btnEditar.on_click= self.click_Editar
@@ -683,7 +697,7 @@ class dtLinha_Prof(dtLinha):
                     [
                         self.txtMaterias,
                         self.btnSlct_Materia
-                    ], scroll= ft.ScrollMode.AUTO
+                    ], scroll= ft.ScrollMode.AUTO, horizontal_alignment= ft.CrossAxisAlignment.CENTER, width=180
                 )
             ))               
         self.linha.cells.append(ft.DataCell(
@@ -695,6 +709,10 @@ class dtLinha_Prof(dtLinha):
                 ])
             )
         )
+    def ajustaLinhas(self):
+        self.texts.append(self.txtMaterias)
+        return super().ajustaLinhas()
+
     def troca_Visible(self):
         self.btnSlct_Materia.visible = not self.btnSlct_Materia.visible
         return super().troca_Visible()
@@ -707,7 +725,7 @@ class dtLinha_Prof(dtLinha):
         self.troca_Visible()
         self.fldNome.value = self.txtNome.value
         self.fldEmail.value = self.txtEmail.value
-        self.fldSenha.value = self.txtSenha.value
+        self.fldSenha.value = self._senha
         self.marca_Materias()
         self.page.update()
 
@@ -749,7 +767,6 @@ class dtLinha_Prof(dtLinha):
 
 class  dtLinha_Aluno(dtLinha):
     def __init__(self, page, nome, usuario, senha, email, idTurma, listTurmas):
-        super().__init__(page, nome, usuario, senha, email)
         
         #Campo de Turmas
         self.idTurma = idTurma
@@ -757,6 +774,10 @@ class  dtLinha_Aluno(dtLinha):
         self.dicTurmas = dict(self.listTurmas)
         
         self.txtTurma = ft.Text(self.dicTurmas.get(idTurma))
+
+        super().__init__(page, nome, usuario, senha, email)
+        
+        
         self.dropTurma = ft.Dropdown(
             label="Turmas",
             enable_filter=True,
@@ -774,8 +795,6 @@ class  dtLinha_Aluno(dtLinha):
                         )
                     )
         self.dropTurma.value = idTurma
-        
-        self.texts.append(self.txtTurma)
 
         self.btnConfirmar.on_click = self.click_Confirmar
 
@@ -797,6 +816,10 @@ class  dtLinha_Aluno(dtLinha):
             )
         )
     
+    def ajustaLinhas(self):
+        self.texts.append(self.txtTurma)
+        return super().ajustaLinhas()
+
     def click_Confirmar(self, e):
         try:
             connection.connect()
@@ -830,7 +853,6 @@ class  dtLinha_Turma(dtLinha):
         super().__init__(page, nome, usuario, senha, email)
 
     def __init__(self, page, nome, usuario, periodo, ano):
-        super().__init__(page, nome, usuario, None, None)
         
         self.periodo = periodo
         self.ano = ano
@@ -850,36 +872,13 @@ class  dtLinha_Turma(dtLinha):
         )
         self.drpPeriodo.value = periodo
 
-
-
-
         self.fldAno = ft.TextField(value=ano, visible=False, expand=True, text_size=15)
 
-        #Remover Oq não é usado da classe pai
-        self.texts.clear()
-        self.texts = [self.txtNome, self.txtPeriodo, self.txtAno]
 
-        del self.linha.cells[-2:] #Remove txt senha e email
-        del self.fields[-2:]
-
-        self.fields.append(self.drpPeriodo)
-        self.fields.append(self.fldAno)
+        super().__init__(page, nome, usuario, None, None)
+        
 
         self.btnConfirmar.on_click = self.click_Confirmar
-
-        self.linha.cells.append(ft.DataCell(
-                ft.Row([
-                    self.txtPeriodo, self.drpPeriodo
-                ])
-            )
-        )
-
-        self.linha.cells.append(ft.DataCell(
-                ft.Row([
-                    self.txtAno, self.fldAno
-                ])
-            )
-        )
 
         #botões de Edição
         self.linha.cells.append(ft.DataCell(
@@ -892,9 +891,33 @@ class  dtLinha_Turma(dtLinha):
                 ], alignment= ft.MainAxisAlignment.END, expand=True)
             )
         )
-    
+    def ajustaLinhas(self):
+        #Remover Oq não é usado da classe pai
+        del self.cells[-2:] #Remove txt senha e email
+        del self.fields[-2:]
+        self.texts.clear()
+        self.texts = [self.txtNome, self.txtPeriodo, self.txtAno]
+        self.fields.append(self.fldAno)
+
+        self.cells.append(ft.DataCell(
+                ft.Column([
+                    self.txtPeriodo, self.drpPeriodo
+                ], width=150)
+            )
+        )
+
+        self.cells.append(ft.DataCell(
+                ft.Column([
+                    self.txtAno, self.fldAno
+                ], width=100)
+            )
+        )
+        teste = self.cells[1].content.width =50
+        return super().ajustaLinhas()
+
     def troca_Visible(self):
         self.btnDetalhar.visible = not self.btnDetalhar.visible
+        self.drpPeriodo.visible = not self.drpPeriodo.visible
         
         return super().troca_Visible()
 
