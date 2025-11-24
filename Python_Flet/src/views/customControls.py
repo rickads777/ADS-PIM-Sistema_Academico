@@ -835,7 +835,7 @@ class  dtLinha_Turma(dtLinha):
         self.periodo = periodo
         self.ano = ano
 
-        self.btnDetalhar = ft.IconButton(icon=ft.Icons.MANAGE_SEARCH)
+        self.btnDetalhar = ft.IconButton(icon=ft.Icons.MANAGE_SEARCH, on_click=lambda e: self.page.go(f"/admin/turmas/{self.usuario}"))
 
         self.txtPeriodo = ft.Text(periodo)
         self.txtAno = ft.Text(ano)

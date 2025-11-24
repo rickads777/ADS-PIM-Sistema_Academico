@@ -297,6 +297,16 @@ class views_Adm(Views):
         super().TableView()
         self.content.route ="/admin/turmas"
         return self.content
+    
+    #Visualização da Turma
+
+    def detalheTurma_view(self, id):
+        super().HomeView()
+
+        self.homeMeio.controls.append(Text(id))
+
+        return self.content
+
 
 class views_aluno(Views):
     def __init__(self, page, sidebar):

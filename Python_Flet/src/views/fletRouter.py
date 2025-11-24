@@ -32,6 +32,8 @@ class Router:
     def route_change(self):
         #Puxar do dicionário a pagina atrelada ao Route indicado e coloca-la nas views
         #self.page.views.append(self.routes.get(self.page.route))
+        troute = TemplateRoute(self.page.route) #Pega a rota por um template, para pegar ids diferentes etc
+
         if self.page.route == "/": #Limpar as telas num logout
             self.page.views.clear()
 
@@ -43,6 +45,10 @@ class Router:
             case "/admin/turmas": self.page.views.append(views_Adm(self.page, self.sideAdmin).tabTurmas_View())
             case "/aluno/home": self.page.views.append(views_aluno(self.page, self.sideAluno).HomeView())
             case "/prof/home": self.page.views.append(views_Professor(self.page, self.sideProf).HomeView())
+            case _:
+                if troute.match("/admin/turmas/:id"): self.page.views.append(views_Adm(self.page, self.sideAdmin).detalheTurma_view(troute.id))
+                else:
+                    pass
         self.page.update()
         
 # TESTANDO
