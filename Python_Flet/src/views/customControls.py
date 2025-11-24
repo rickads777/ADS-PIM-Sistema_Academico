@@ -242,10 +242,10 @@ class cxCadastro_Turma:
         
         # Drop Preiodo
         self.drpPeriodo = ft.Dropdown(
-            label="Perído",
+            label="Período",
             options=[
                 ft.DropdownOption(key="Matutino"),
-                ft.DropdownOption(key="Verpertino"),
+                ft.DropdownOption(key="Vespertino"),
                 ft.DropdownOption(key="Noturno"),
                 ft.DropdownOption(key="Integral"),
             ],
@@ -478,6 +478,22 @@ class Tab_alunos(Tabela):
             
             self.Tab.rows.append(
                 dtLinha_Aluno(self.page, nome, usuario, senha, email, idTurma, self.listTurmas).linha
+            )
+
+## Tabela Turmas
+class Tab_Turmas(Tabela):
+    def __init__(self, page, nomeTabela, colunas, linhas):
+        super().__init__(page, nomeTabela, colunas, linhas)
+        self.criarLinhas()
+
+    def criarLinhas(self):
+        #Seleciona as linhas da tabela
+        linhas_dtTble = select_DB(self.nomeTabela,self.linhas)
+
+        for id, nome, periodo, ano in linhas_dtTble:
+            
+            self.Tab.rows.append(
+                dtLinha_Turma(self.page, nome, str(id), periodo, ano).linha
             )
 
 #linhas das DataTable
@@ -806,4 +822,90 @@ class  dtLinha_Aluno(dtLinha):
     def click_Cancelar(self, e):
         self.dropTurma.visible = not self.dropTurma.visible
         self.dropTurma.value = self.idTurma 
+        return super().click_Cancelar(e)
+
+## Linhas para tb_Turmas
+class  dtLinha_Turma(dtLinha):
+    def __init__(self, page, nome, usuario, senha, email):
+        super().__init__(page, nome, usuario, senha, email)
+
+    def __init__(self, page, nome, usuario, periodo, ano):
+        super().__init__(page, nome, usuario, None, None)
+        
+        self.periodo = periodo
+        self.ano = ano
+
+        self.btnDetalhar = ft.IconButton(icon=ft.Icons.MANAGE_SEARCH)
+
+        self.txtPeriodo = ft.Text(periodo)
+        self.txtAno = ft.Text(ano)
+        
+        self.drpPeriodo = ft.Dropdown(
+            options=[
+                ft.DropdownOption(key="Matutino"),
+                ft.DropdownOption(key="Vespertino"),
+                ft.DropdownOption(key="Noturno"),
+                ft.DropdownOption(key="Integral"),
+            ], visible= False
+        )
+        self.drpPeriodo.value = periodo
+
+
+
+
+        self.fldAno = ft.TextField(value=ano, visible=False, expand=True, text_size=15)
+
+        #Remover Oq não é usado da classe pai
+        self.texts.clear()
+        self.texts = [self.txtNome, self.txtPeriodo, self.txtAno]
+
+        del self.linha.cells[-2:] #Remove txt senha e email
+        del self.fields[-2:]
+
+        self.fields.append(self.drpPeriodo)
+        self.fields.append(self.fldAno)
+
+        self.btnConfirmar.on_click = self.click_Confirmar
+
+        self.linha.cells.append(ft.DataCell(
+                ft.Row([
+                    self.txtPeriodo, self.drpPeriodo
+                ])
+            )
+        )
+
+        self.linha.cells.append(ft.DataCell(
+                ft.Row([
+                    self.txtAno, self.fldAno
+                ])
+            )
+        )
+
+        #botões de Edição
+        self.linha.cells.append(ft.DataCell(
+            ft.Row([
+                self.btnDetalhar,
+                self.btnEditar, 
+                self.btnExcluir,
+                self.btnConfirmar,
+                self.btnCancelar
+                ], alignment= ft.MainAxisAlignment.END, expand=True)
+            )
+        )
+    
+    def troca_Visible(self):
+        self.btnDetalhar.visible = not self.btnDetalhar.visible
+        
+        return super().troca_Visible()
+
+
+    def click_Confirmar(self, e):
+        pass
+    
+    def click_Editar(self, e):
+        return super().click_Editar(e)
+    
+    def click_Cancelar(self, e):
+        self.drpPeriodo.value = self.txtPeriodo.value   
+        self.fldAno.value = self.txtAno.value  
         return super().click_Cancelar(e)

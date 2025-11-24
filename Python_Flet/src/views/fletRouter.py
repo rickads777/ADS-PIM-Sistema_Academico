@@ -40,6 +40,7 @@ class Router:
             case "/admin/home": self.page.views.append(views_Adm(self.page, self.sideAdmin).HomeView())
             case "/admin/professores": self.page.views.append(views_Adm(self.page, self.sideAdmin).tabProfessores_View())
             case "/admin/alunos": self.page.views.append(views_Adm(self.page, self.sideAdmin).tabAlunos_View())
+            case "/admin/turmas": self.page.views.append(views_Adm(self.page, self.sideAdmin).tabTurmas_View())
             case "/aluno/home": self.page.views.append(views_aluno(self.page, self.sideAluno).HomeView())
             case "/prof/home": self.page.views.append(views_Professor(self.page, self.sideProf).HomeView())
         self.page.update()

@@ -22,9 +22,9 @@ CREATE TABLE Professor(
 
 CREATE TABLE Turma(
 	idTurma INT NOT NULL AUTO_INCREMENT,
-    nome varchar(50),
-    periodo varchar(50),
-    anoLetivo int,
+    nome varchar(20),
+    periodo varchar(11),
+    anoInicio int,
     PRIMARY KEY (idTurma)
 );
 CREATE TABLE Professor_Turma(
@@ -91,11 +91,10 @@ CREATE TABLE Aluno_Atividade(
 
 insert into Admin (nome, usuario, email, senha) values ("Cadastro0","admin","email@email.com", "admin"); 
 insert into Professor (nome, usuario, email, senha) values ("Sr.Teste","P1","email@email.com", "prof"); 
-insert into Turma (nome, periodo, anoletivo) values ("A","Tarde",2025); 
-insert into Materia (nome) values ("Ciência"); 
+insert into Turma (nome, periodo, anoInicio) values ("A","Vespertino",2025); 
+insert into Turma (nome, periodo, anoInicio) values ("B","Matutino",2025); 
+insert into Materia (nome) values ("Ciências"); 
 insert into Professor_Materia (idProfessor, idmateria) values (1,1);
-insert into Materia (nome) values ("Ciências  Humanas"); 
-insert into Professor_Materia (idProfessor, idmateria) values (1,2);
 select * from Professor as p inner join Professor_materia as mp on p.idprofessor = mp.idprofessor inner join materia as m on m.idmateria = mp.idmateria;
 select m.nome from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where p.idprofessor = 1;
 
