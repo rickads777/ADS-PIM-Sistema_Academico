@@ -91,7 +91,7 @@ CREATE TABLE Aluno_Atividade(
     FOREIGN KEY(idAtividade) REFERENCES Atividade(idAtividade)
 );
 
-insert into Admin (nome, usuario, email, senha) values ("Cadastro0","admin","email@email.com", "admin"); 
+insert into Admin (nome, usuario, email, senha) values ("Cadastro0","R1","email@email.com", "admin"); 
 insert into Professor (nome, usuario, email, senha) values ("Sr.Teste","P1","email@email.com", "prof"); 
 insert into Turma (nome, periodo, anoInicio) values ("A","Vespertino",2025); 
 insert into Turma (nome, periodo, anoInicio) values ("B","Matutino",2025); 
