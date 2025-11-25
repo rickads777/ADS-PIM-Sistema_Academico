@@ -7,18 +7,18 @@ def Login( page: ft.Page, nome: ft.TextField, senha : ft.TextField):
 
     #Teste se caractere identificador existe, e então procuta na tabela específica
     if nome.value.find("R") == 0: #Se admin
-        if senha.value != select_Senha("admin", senha.value):
+        if senha.value != select_Senha("admin", nome.value):
             senha.error_text = "Senha Incorreta"
         else:
             page.go("/admin/home")
 
     elif nome.value.find("A") == 0:#Se aluno
-        if senha.value != select_Senha("aluno", senha.value):
+        if senha.value != select_Senha("aluno", nome.value):
             senha.error_text = "Senha Incorreta"
         else:
             page.go("/aluno/home")
     elif nome.value.find("P") == 0:#Se aluno
-        if senha.value != select_Senha("professor", senha.value):
+        if senha.value != select_Senha("professor", nome.value):
             senha.error_text = "Senha Incorreta"
         else:
             page.go("/prof/home")

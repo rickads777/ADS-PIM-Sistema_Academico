@@ -73,7 +73,7 @@ def select_Next_Increment(table):
 
 def select_Senha(table, senha):
     connection.connect()
-    cursor.execute(f'SELECT senha FROM {table} where senha = "{senha}"')
+    cursor.execute(f'SELECT senha FROM {table} where usuario = "{senha}"')
     ret = str(cursor.fetchall()).strip("[](\'),")
     connection.close()
     return ret
