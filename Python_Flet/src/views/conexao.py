@@ -13,12 +13,25 @@ connection.close()
 #Exemplo Create
 #Select
 
-def select_DB (table, colunas):
+def select_DB (table, colunas, condicao_where = None):
     connection.connect()
-    cursor.execute(f'SELECT {colunas} FROM {table}')
+    if condicao_where == None:
+        cursor.execute(f'SELECT {colunas} FROM {table}')
+    else:
+        cursor.execute(f'SELECT {colunas} FROM {table} where {condicao_where}')
     ret = cursor.fetchall()
     connection.close()
     return ret 
+
+def select_Um (table, colunas, condicao_where = None):
+    connection.connect()
+    if condicao_where == None:
+        cursor.execute(f'SELECT {colunas} FROM {table}')
+    else:
+        cursor.execute(f'SELECT {colunas} FROM {table} where {condicao_where}')
+    ret = cursor.fetchall()
+    connection.close()
+    return str(ret).strip("[](\'),") 
 
 def select_Unicos_DB (table, colunas):
     connection.connect()

@@ -354,23 +354,33 @@ class cxMateria_Professor:
 
         self.dcMaterias = {}
         self.dcIdS_materia = {}
+        self.dcProfessores = {}
+
+        self.dtLinhas = []
         
         for materia, id in select_Unicos_DB("Materia","nome, idmateria"):
             self.dcMaterias.update({id:materia})
             self.dcIdS_materia.update({materia:id})
-        self.listID_Materias = []
-        self.listMaterias = []
 
+        for nome,id in select_DB("Professor", "nome,idprofessor"):
+            self.dcProfessores.update({id:nome}) 
+
+        self.listID_Materias = [] #Id das materias salvas no banco
+        self.listMaterias = [] #Materias Salvas no Banco
+
+        #Buscar Matérias Salvas no Banco
         for id in generic_Select_DB(f"select idmateria from professor_turma where idturma = {int(idTurma)}"):
             self.listID_Materias.append(int(str(id).strip("(,\')")))
         
         for id in self.listID_Materias:
             self.listMaterias.append(self.dcMaterias.get(id))
-
+        
         cxCadastro = caixaCadastros(page)
         
         self.alertMat = cxCadastro.alertMaterias
-        self.alertMat.popEsc_Mat.on_dismiss = self.click_alertConfirmar
+        self.alertMat.btnConfirmar.on_click= self.click_alertMat_Confirmar
+        self.alertMat.btnCancelar.on_click= self.click_alertMat_Cancelar
+
         self.btnSlc_Materias = cxCadastro.btnSlct_Materia
 
 
@@ -382,7 +392,7 @@ class cxMateria_Professor:
             icon=ft.Icons.CHECK_CIRCLE, 
             icon_color=ft.Colors.LIGHT_BLUE,
             visible= False,
-            #on_click= self.Salvar
+            on_click= self.click_Confirmar
         )
         self.btnCancelar = ft.IconButton(
             icon=ft.Icons.CANCEL,
@@ -418,10 +428,33 @@ class cxMateria_Professor:
 
     def atualizarLinhas(self):
         self.tab.rows.clear()
-        for materia in self.alertMat.Materias_Escolhidas:
+    
+        self.listMaterias.clear()
+        self.listID_Materias.clear()
+
+        for id in generic_Select_DB(f"select idmateria from professor_turma where idturma = {int(self.idTurma)}"):
+            self.listID_Materias.append(int(str(id).strip("(,\')")))
+        
+        for id in self.listID_Materias:
+            self.listMaterias.append(self.dcMaterias.get(id))
+
+                    
+
+        for materia in self.listID_Materias:
+            idProfessor = select_Um("professor_turma","idprofessor", f"idmateria = {materia} and idturma = {self.idTurma}")
+            if idProfessor != "None":
+               linha = linha_Materia_Prefessor(self.page, materia, self.dcMaterias, self.dcProfessores, idProfessor=int(idProfessor))
+               linha.alertProfMat.idProfessor_Escolhido = int(idProfessor)
+               check : ft.Checkbox
+               for check in linha.alertProfMat.checkboxes:
+                   if check.key == idProfessor:
+                       check.value =True
+            else:
+               linha = linha_Materia_Prefessor(self.page, materia,self.dcMaterias, self.dcProfessores )
             self.tab.rows.append(
-                linha_Materia_Prefessor(self.page, materia, self.dcMaterias).linha
+                linha.linha
             )
+            self.dtLinhas.append(linha)
         self.page.update()
 
     
@@ -430,15 +463,66 @@ class cxMateria_Professor:
 
     def click_Cancelar(self,e):
         self.troca_Visible()
+    
+    def click_Confirmar(self,e):
+        linha: linha_Materia_Prefessor
+        for linha in self.dtLinhas:
+            nome = self.dcProfessores.get(int(linha.alertProfMat.idProfessor_Escolhido))
+            if nome != None:
+                linha.txtSlcProfessor.value =  nome
+                generic_Comitable(f"update professor_turma set idprofessor = {linha.alertProfMat.idProfessor_Escolhido} where idturma = {self.idTurma} and idmateria = {linha.idMateria}")
+            else:
+                linha.txtSlcProfessor.value =  "Atribua um Professor"
+        self.page.open(ft.SnackBar(ft.Text("Materias / Professores atualizado com sucesso")))
+        self.troca_Visible()
 
-    def click_alertConfirmar(self,e):
+    def click_alertMat_Confirmar(self,e):
+        self.alertMat.salvarEscolha_Materias(e)
+        
+        #Salvar 
+        idMat_Inseridas = []
+        for idMateria in self.alertMat.Materias_Escolhidas:
+            if idMateria not in self.listID_Materias:
+                #Se uma materia nova for escolhida, deve ser inserida
+                idMat_Inseridas.append(idMateria)
+
+        for id in idMat_Inseridas:
+            generic_Comitable(f"insert into professor_turma (idturma,idmateria) values ({int(self.idTurma)},{id})")
+
+        #Deletar
+        idMat_Excluídas = []
+        for idMateria in self.listID_Materias: 
+            if idMateria not in self.alertMat.Materias_Escolhidas:
+                #Se uma materia que já exista não for excolhida dnv, exluir
+                idMat_Excluídas.append(idMateria)
+
+        for id in idMat_Excluídas:
+            generic_Comitable(f"Delete from professor_turma where idturma = {int(self.idTurma)} and idmateria = {id}")
+        
         self.atualizarLinhas()
-
+        linha: linha_Materia_Prefessor
+        for linha in self.dtLinhas:
+            linha.btnSlcProfessor.visible = not linha.btnSlcProfessor.visible
+            linha.txtSlcProfessor.visible = not linha.txtSlcProfessor.visible
+        self.page.update()
+    
+    def click_alertMat_Cancelar(self,e):
+        self.page.close(self.alertMat.popEsc_Mat)
+        check: ft.Checkbox
+        for check in self.alertMat.alertBody.controls:
+            if check.key not in self.listID_Materias:
+                check.value = False
+        pass
+    
     def troca_Visible(self):
         self.btnEditar.visible = not self.btnEditar.visible
         self.btnConfirmar.visible = not self.btnConfirmar.visible
         self.btnCancelar.visible = not self.btnCancelar.visible
         self.btnSlc_Materias.visible = not self.btnSlc_Materias.visible
+        linha: linha_Materia_Prefessor
+        for linha in self.dtLinhas:
+            linha.btnSlcProfessor.visible = not linha.btnSlcProfessor.visible
+            linha.txtSlcProfessor.visible = not linha.txtSlcProfessor.visible
         self.page.update()
 
     def marca_Materias(self):
@@ -450,15 +534,28 @@ class cxMateria_Professor:
                 self.alertMat.Materias_Escolhidas.append(self.dcIdS_materia.get(check.label))
 
 class linha_Materia_Prefessor:
-    def __init__(self, page: ft.Page, idMateria, dcMaterias: dict):
+    def __init__(self, page: ft.Page, idMateria, dcMaterias: dict, dcProfessores: dict, idProfessor = None):
         self.page = page
+        self.idMateria = int(idMateria)
+
+        self.btnSlcProfessor = ft.TextButton("Selecionar Professor", on_click= lambda e: self.page.open(self.alertProfMat.popProfessores), visible=False)
+        self.txtSlcProfessor = ft.Text("Atribua um Professor")
+
+        if idProfessor !=None:
+            self.txtSlcProfessor.value = dcProfessores.get(int(idProfessor))
+
         self.linha = ft.DataRow(
             cells=[
                 ft.DataCell(ft.Text(f"{dcMaterias.get(idMateria)}")),
-                ft.DataCell(ft.TextButton("Selecionar Professor", on_click= lambda e: self.page.open(self.alertProfMat.popProfessores)))
+                ft.DataCell(ft.Column(
+                    [
+                        self.btnSlcProfessor,
+                        self.txtSlcProfessor
+                    ], expand=True, alignment=ft.MainAxisAlignment.CENTER
+                ))
             ]
         )
-        self.alertProfMat = popProfessores_porMateria(idMateria, dcMaterias)
+        self.alertProfMat = popProfessores_porMateria(self.page,idMateria, dcMaterias)
         self.alertProfMat.btnConfirma.on_click = self.click_Confirmar
         self.alertProfMat.btnCancela.on_click = self.click_Cancelar
 
@@ -476,11 +573,14 @@ class popEsc_Materia:
     def __init__(self, page: ft.Page):
         self.page = page
         self.alertBody= ft.Column(wrap=True, scroll= ft.ScrollMode.AUTO)
+        self.btnConfirmar = ft.TextButton("Confirmar", on_click=self.salvarEscolha_Materias)
+        self.btnCancelar = ft.TextButton("Cancelar", on_click=lambda e: self.page.close(self.popEsc_Mat))
+
         self.popEsc_Mat = ft.AlertDialog(
             title=ft.Text("Selecione as Matérias"),
             actions=[
-                ft.TextButton("Confirmar", on_click=self.salvarEscolha_Materias),
-                ft.TextButton("Cancelar", on_click=lambda e: self.page.close(self.popEsc_Mat))
+                self.btnConfirmar,
+                self.btnCancelar
             ],
             actions_alignment=ft.MainAxisAlignment.END,
             content= self.alertBody,
@@ -496,7 +596,7 @@ class popEsc_Materia:
         Materias = select_Unicos_DB("Materia","nome, idmateria") 
         for materia, id in Materias:
             self.alertBody.controls.append(
-                ft.Checkbox(label=materia, value=False)
+                ft.Checkbox(label=materia, value=False, key=id)
             )
             self.dbMaterias.update({materia:id})
     
@@ -531,21 +631,22 @@ class popExcluir_Cadastro:
 ##Pop Up Professores atrelados a materia
 
 class popProfessores_porMateria:
-    def __init__(self, idMateria, dcMateria: dict):
+    def __init__(self, page:ft.Page, idMateria, dcMateria: dict):
+        self.page = page
         self.idMateria = idMateria
         self.dcMateria = dcMateria
-        self.idProfessor_Escolhido:int = None
+        self.idProfessor_Escolhido:int = 0
 
-        self.professores = generic_Select_DB(f"select p.nome, p.usuario from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where m.idmateria = {int(idMateria)}")
+        self.professores = generic_Select_DB(f"select p.nome, p.usuario, p.idprofessor from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where m.idmateria = {int(idMateria)}")
 
         self.btnConfirma = ft.TextButton("Confirmar")
         self.btnCancela = ft.TextButton("Cancelar")
         
         self.checkboxes = []
 
-        for nome, usuario in self.professores:
+        for nome, usuario, id in self.professores:
             self.checkboxes.append(
-                ft.Checkbox(label=f"{usuario} | {nome}")
+                ft.Checkbox(label=f"{usuario} | {nome}", key=str(id), on_change=self.check)
             )
         self.alertBody = ft.Column(
             controls= self.checkboxes
@@ -562,6 +663,15 @@ class popProfessores_porMateria:
             content= self.alertBody,
             modal=True
         )
+
+    def check (self,e: ft.ControlEvent ):
+        ckClicada:ft.Checkbox = e.control
+        check: ft.Checkbox
+        for check in self.checkboxes:
+            if check.key != ckClicada.key:
+                check.value = False
+        self.idProfessor_Escolhido = ckClicada.key
+        self.page.update()
 
         
 
