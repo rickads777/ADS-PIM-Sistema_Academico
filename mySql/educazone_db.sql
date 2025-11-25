@@ -27,13 +27,7 @@ CREATE TABLE Turma(
     anoInicio int,
     PRIMARY KEY (idTurma)
 );
-CREATE TABLE Professor_Turma(
-    idProfessor int,
-    idTurma int,
-    FOREIGN KEY(idProfessor) REFERENCES Professor(idProfessor),
-    FOREIGN KEY(idTurma) REFERENCES Turma(idTurma)
-    
-);
+
 CREATE TABLE Aluno(
 	idAluno INT NOT NULL AUTO_INCREMENT,
     idTurma INT NOT NULL,
@@ -69,6 +63,14 @@ CREATE TABLE Professor_Materia(
     FOREIGN KEY(idMateria) REFERENCES Materia(idMateria)
     
 );
+CREATE TABLE Professor_Turma(
+    idProfessor int,
+    idTurma int,
+    idmateria int,
+    FOREIGN KEY(idProfessor) REFERENCES Professor(idProfessor),
+    FOREIGN KEY(idTurma) REFERENCES Turma(idTurma),
+    FOREIGN KEY(idmateria) REFERENCES materia(idMateria)
+);
 CREATE TABLE Atividade(
 	idAtividade INT NOT NULL AUTO_INCREMENT,
     idProfessor INT,
@@ -98,6 +100,8 @@ insert into Professor_Materia (idProfessor, idmateria) values (1,1);
 select * from Professor as p inner join Professor_materia as mp on p.idprofessor = mp.idprofessor inner join materia as m on m.idmateria = mp.idmateria;
 select m.nome from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where p.idprofessor = 1;
 
+select usuario,nome,email from aluno where idturma = 1; 
+
 select * from professor_materia;
 select * from aluno;
 
@@ -123,4 +127,10 @@ INSERT INTO Materia (nome) VALUES
 ('Literatura'),
 ('Empreendedorismo'),
 ('Educação Financeira');
+
+#select p.nome, p.idprofessor from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where m.idmateria = 1;
+#select p.nome, p.idprofessor from professor as p inner join professor_turma as pt on p.idprofessor = pt.idprofessor inner join materia as m on pt.idmateria = m.idmateria where m.idmateria = 1;
+#insert into professor_turma (idprofessor,idturma,idmateria) values();
+#insert into professor_turma (idturma,idmateria) values(1,1);
+#insert into professor_turma (idturma,idmateria) values(1,2);
 

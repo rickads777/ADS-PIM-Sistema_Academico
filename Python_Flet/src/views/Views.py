@@ -160,11 +160,11 @@ class Views:
                         #final
                         self.homeFim
                     ],
-                    expand=True
+                    expand=True, scroll=ft.ScrollMode.AUTO
                 ),
-            ],expand=True
+            ],expand=True, vertical_alignment= ft.CrossAxisAlignment.START
 
-        )
+        ) 
         self.sidebar.rail.selected_index = 0
         self.body.controls.insert(0, self.sidebar.ctn) #Adiciona sidebar primeiro
         self.content.controls.append(self.body) #add corpo a view    
@@ -302,8 +302,49 @@ class views_Adm(Views):
 
     def detalheTurma_view(self, id):
         super().HomeView()
+        nomeTurma = str(generic_Select_DB(f"select nome from turma where idturma = {id}"))
+        nomeTurma = nomeTurma.strip("[(\',)]")
+        tbDet_Alunos = tab_Detalhes_Turma_Alunos(self.page, id)
+        caixaMaterias = cxMateria_Professor(self.page, id)
+        #Cabeçalho
+        self.homeMeio.controls.append(ft.Column(
+            [
+                ft.Row(
+                        [
+                            ft.Text(f"Turma {nomeTurma}", size=25)
+                        ]
+                    ),
+                ft.Row(
+                    [
+                        ft.Container(
+                            content=
+                                ft.Column(
+                                    [
+                                        ft.Text("Alunos", size=20),
+                                        tbDet_Alunos.Tab
+                                    ], horizontal_alignment= ft.CrossAxisAlignment.CENTER
+                                ),
+                            bgcolor=ft.Colors.LIGHT_BLUE_800, border_radius= 10, padding=padding.only(top=10)
+                        )
+                    ]
+                ),
+                ft.Row(
+                    [
+                        ft.Container(
+                            content=
+                                ft.Column(
+                                    [
+                                        caixaMaterias.content
+                                    ]
 
-        self.homeMeio.controls.append(Text(id))
+                                )
+
+                        )
+                    ]
+                )
+            ]
+        ))
+
 
         return self.content
 

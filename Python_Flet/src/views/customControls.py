@@ -347,6 +347,128 @@ class cxCadastro_Turma:
         self.drpPeriodo.border_color = ft.Colors.WHITE
         self.fldAno_Letivo.error_text = None
 
+class cxMateria_Professor:
+    def __init__(self, page: ft.Page, idTurma):
+        self.page = page
+        self.idTurma = idTurma
+
+        self.dcMaterias = {}
+        self.dcIdS_materia = {}
+        
+        for materia, id in select_Unicos_DB("Materia","nome, idmateria"):
+            self.dcMaterias.update({id:materia})
+            self.dcIdS_materia.update({materia:id})
+        self.listID_Materias = []
+        self.listMaterias = []
+
+        for id in generic_Select_DB(f"select idmateria from professor_turma where idturma = {int(idTurma)}"):
+            self.listID_Materias.append(int(str(id).strip("(,\')")))
+        
+        for id in self.listID_Materias:
+            self.listMaterias.append(self.dcMaterias.get(id))
+
+        cxCadastro = caixaCadastros(page)
+        
+        self.alertMat = cxCadastro.alertMaterias
+        self.alertMat.popEsc_Mat.on_dismiss = self.click_alertConfirmar
+        self.btnSlc_Materias = cxCadastro.btnSlct_Materia
+
+
+        self.btnEditar = ft.IconButton(
+            icon=ft.Icons.EDIT,
+            on_click= self.click_Editar
+        )
+        self.btnConfirmar = ft.IconButton(
+            icon=ft.Icons.CHECK_CIRCLE, 
+            icon_color=ft.Colors.LIGHT_BLUE,
+            visible= False,
+            #on_click= self.Salvar
+        )
+        self.btnCancelar = ft.IconButton(
+            icon=ft.Icons.CANCEL,
+            icon_color=ft.Colors.LIGHT_BLUE,
+            visible= False,
+            on_click= self.click_Cancelar
+            
+        )
+        self.tab = ft.DataTable(
+            columns=[
+                ft.DataColumn(ft.Text("Materia")),
+                ft.DataColumn(ft.Text("Professor"))
+            ]
+        )
+        self.content = ft.Container(
+            content=ft.Column(
+                [
+                    ft.Row(
+                        [
+                            ft.Text("Matérias / Professores"),
+                            self.btnEditar,
+                            self.btnConfirmar,
+                            self.btnCancelar  
+                        ]
+                    ),
+                    self.btnSlc_Materias,
+                    self.tab
+                ],expand=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER
+            )
+        )
+        self.marca_Materias()
+        self.atualizarLinhas()
+
+    def atualizarLinhas(self):
+        self.tab.rows.clear()
+        for materia in self.alertMat.Materias_Escolhidas:
+            self.tab.rows.append(
+                linha_Materia_Prefessor(self.page, materia, self.dcMaterias).linha
+            )
+        self.page.update()
+
+    
+    def click_Editar(self,e):
+        self.troca_Visible()
+
+    def click_Cancelar(self,e):
+        self.troca_Visible()
+
+    def click_alertConfirmar(self,e):
+        self.atualizarLinhas()
+
+    def troca_Visible(self):
+        self.btnEditar.visible = not self.btnEditar.visible
+        self.btnConfirmar.visible = not self.btnConfirmar.visible
+        self.btnCancelar.visible = not self.btnCancelar.visible
+        self.btnSlc_Materias.visible = not self.btnSlc_Materias.visible
+        self.page.update()
+
+    def marca_Materias(self):
+        #Selecionar as matérias que já estão cadastradas
+        check: ft.Checkbox
+        for check in self.alertMat.alertBody.controls:
+            if check.label in self.listMaterias:
+                check.value = True
+                self.alertMat.Materias_Escolhidas.append(self.dcIdS_materia.get(check.label))
+
+class linha_Materia_Prefessor:
+    def __init__(self, page: ft.Page, idMateria, dcMaterias: dict):
+        self.page = page
+        self.linha = ft.DataRow(
+            cells=[
+                ft.DataCell(ft.Text(f"{dcMaterias.get(idMateria)}")),
+                ft.DataCell(ft.TextButton("Selecionar Professor", on_click= lambda e: self.page.open(self.alertProfMat.popProfessores)))
+            ]
+        )
+        self.alertProfMat = popProfessores_porMateria(idMateria, dcMaterias)
+        self.alertProfMat.btnConfirma.on_click = self.click_Confirmar
+        self.alertProfMat.btnCancela.on_click = self.click_Cancelar
+
+    def click_Confirmar(self, e):
+        self.page.close(self.alertProfMat.popProfessores)
+
+    def click_Cancelar(self, e):
+        self.page.close(self.alertProfMat.popProfessores)
+
+
 #Pop Ups
 
 ##Pop Up para Prof Escolher materias
@@ -396,15 +518,52 @@ class popExcluir_Cadastro:
         self.btnConfirma = ft.TextButton("Confirmar")
         self.btnCancela = ft.TextButton("Cancelar")
         self.popExcluir = ft.AlertDialog(
-        title=ft.Text(f"Excluindo - {self.usuario}"),
-        actions=[
-            self.btnConfirma,
-            self.btnCancela
-        ],
-        actions_alignment=ft.MainAxisAlignment.END,
-        content= ft.Text("Você realmente deseja realizar a exclusão? Essa alteração é final"),
-        modal=True
-    )
+            title=ft.Text(f"Excluindo - {self.usuario}"),
+            actions=[
+                self.btnConfirma,
+                self.btnCancela
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+            content= ft.Text("Você realmente deseja realizar a exclusão? Essa alteração é final"),
+            modal=True
+        )
+
+##Pop Up Professores atrelados a materia
+
+class popProfessores_porMateria:
+    def __init__(self, idMateria, dcMateria: dict):
+        self.idMateria = idMateria
+        self.dcMateria = dcMateria
+        self.idProfessor_Escolhido:int = None
+
+        self.professores = generic_Select_DB(f"select p.nome, p.usuario from Materia as m inner join professor_materia as mp on m.idmateria = mp.idmateria inner join professor as p on p.idprofessor = mp.idprofessor where m.idmateria = {int(idMateria)}")
+
+        self.btnConfirma = ft.TextButton("Confirmar")
+        self.btnCancela = ft.TextButton("Cancelar")
+        
+        self.checkboxes = []
+
+        for nome, usuario in self.professores:
+            self.checkboxes.append(
+                ft.Checkbox(label=f"{usuario} | {nome}")
+            )
+        self.alertBody = ft.Column(
+            controls= self.checkboxes
+        )
+
+        
+        self.popProfessores = ft.AlertDialog(
+            title=ft.Text(f"Professores - {dcMateria.get(idMateria)}"),
+            actions=[
+                self.btnConfirma,
+                self.btnCancela
+            ],
+            actions_alignment=ft.MainAxisAlignment.END,
+            content= self.alertBody,
+            modal=True
+        )
+
+        
 
 #Sidebar Controls
 ##navRailDestination
@@ -432,7 +591,7 @@ class Tabela():
         self.colunas = colunas
         self.colunas.append("") #Adiciona coluna sem nada, pra ficar os botões
         self.linhas = linhas
-        self.Tab: ft.DataTable = ft.DataTable (columns=[])
+        self.Tab: ft.DataTable = ft.DataTable(columns=[])
         for coluna in self.colunas:
             self.Tab.columns.append(
                 ft.DataColumn(
@@ -494,6 +653,22 @@ class Tab_Turmas(Tabela):
             
             self.Tab.rows.append(
                 dtLinha_Turma(self.page, nome, str(id), periodo, ano).linha
+            )
+class tab_Detalhes_Turma_Alunos(Tabela):
+    def __init__(self, page, idTurma):
+        super().__init__(page, None, ["RA","Nome", "Email"], None)
+        self.idTurma = idTurma
+        self.Tab.columns.pop()
+        self.criarLinhas()
+        self.Tab.bgcolor = ft.Colors.LIGHT_BLUE_900
+
+    def criarLinhas(self):
+        linhas_dtTble = generic_Select_DB(f"select usuario,nome,email from aluno where idturma = {self.idTurma}")
+
+        for usuario, nome, email in linhas_dtTble:
+            
+            self.Tab.rows.append(
+                dtLinha_Turma_Alunos(self.page, nome, usuario, email, self.idTurma).linha
             )
 
 #linhas das DataTable
@@ -642,15 +817,20 @@ class dtLinha:
                 delete_Registo("admin",self.id, "idadmin")
             case "A":
                 delete_Registo("aluno", self.id, "idaluno")
+                self.atualizar("/admin/alunos")
             case "P":
                 delete_Registo("professor_materia", self.id, "idprofessor")
                 delete_Registo("professor", self.id, "idprofessor")
-                self.page.close(self.alert_Excluir.popExcluir)
-                self.page.update()
-                self.page.go("/admin/home")
-                self.page.go("/admin/professores")
-                self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} excluído com sucesso")))
+                self.atualizar("/admin/professores")
+        self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} excluído com sucesso")))
     
+    def atualizar(self, rota):
+        self.page.close(self.alert_Excluir.popExcluir)
+        self.page.update()
+        self.page.go("/admin/home")
+        self.page.go(rota)
+        self.page.open(ft.SnackBar(ft.Text(f"{self.usuario} excluído com sucesso")))
+
     def click_Editar(self, e):
         self.troca_Visible()
         self.page.update()
@@ -662,9 +842,6 @@ class dtLinha:
         self.fldSenha.value = self._senha
         self.page.update()
 
-            
-
-    
 
 class dtLinha_Prof(dtLinha):
     def __init__(self, page, nome, usuario:str, senha, email, materias: list[str]):
@@ -849,8 +1026,6 @@ class  dtLinha_Aluno(dtLinha):
 
 ## Linhas para tb_Turmas
 class  dtLinha_Turma(dtLinha):
-    def __init__(self, page, nome, usuario, senha, email):
-        super().__init__(page, nome, usuario, senha, email)
 
     def __init__(self, page, nome, usuario, periodo, ano):
         
@@ -912,7 +1087,7 @@ class  dtLinha_Turma(dtLinha):
                 ], width=100)
             )
         )
-        teste = self.cells[1].content.width =50
+        self.cells[1].content.width =50
         return super().ajustaLinhas()
 
     def troca_Visible(self):
@@ -932,3 +1107,50 @@ class  dtLinha_Turma(dtLinha):
         self.drpPeriodo.value = self.txtPeriodo.value   
         self.fldAno.value = self.txtAno.value  
         return super().click_Cancelar(e)
+    
+class dtLinha_Turma_Alunos():
+    def __init__(self, page, nome, usuario, email, idTurma):
+        self.page = page
+        self.nome = nome
+        self.usuario = usuario
+        self.email = email
+        self.idTurma  = idTurma
+
+        #Textos fixos
+        self.txtNome = ft.Text(self.nome)
+        self.txtUsuario = ft.Text(self.usuario)
+        self.txtEmail = ft.Text(self.email)
+        
+        self.cells  = [ft.DataCell(
+                            content=ft.Column(
+                                [
+                                    self.txtUsuario,
+                                ],width=25
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Column(
+                                [
+                                    self.txtNome
+                                ],width=150
+                            )
+                        ),
+                        ft.DataCell(
+                            content=ft.Column(
+                                [
+                                    self.txtEmail
+                                ], width=150
+                            )
+                        )]
+        self.ajustaLinhas()
+        self.linha :ft.DataRow = ft.DataRow(
+            cells=self.cells
+        )
+
+    def ajustaLinhas(self):
+        cell: ft.DataCell
+        for cell in self.cells:
+            linha: ft.Column = cell.content
+            linha.scroll = ft.ScrollMode.AUTO
+            linha.horizontal_alignment = ft.CrossAxisAlignment.CENTER
+            cell.content = linha
